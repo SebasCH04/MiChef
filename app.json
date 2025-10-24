@@ -1,0 +1,37 @@
+{
+  "expo": {
+    "cli": {
+      "appVersionSource": "nativeVersion"
+    },
+    "name": "MiChef",
+    "slug": "MiChef",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/favicon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/LogoTec.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.prototipo.michef"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "2b57f422-c258-457e-bab9-3582ff66208f"
+      }
+    }
+  }
+}
