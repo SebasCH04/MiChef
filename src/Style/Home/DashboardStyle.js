@@ -62,20 +62,22 @@ export const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 15,
     borderRadius: 20, // Bordes más redondeados
-    backgroundColor: '#E0E0E0', // Gris claro
+    backgroundColor: '#0047AB', // Azul base (mismo color que el activo)
     marginRight: 10,
+    opacity: 0.4, // Aplicamos 40% de opacidad a los no activos por defecto
   },
   filterButtonText: {
-    color: '#666',
+    color: 'white', // Texto blanco para todos los botones (se verá tenue por la opacidad)
     fontWeight: '500',
   },
   activeFilterButton: {
-    backgroundColor: '#0d47a1', // Azul para el activo (o el que uses)
+    backgroundColor: '#0047AB', // Mismo color base
+    opacity: 1.0, // Opacidad total (100%)
     borderColor: 'black',
     borderWidth: 2,
   },
   activeFilterButtonText: {
-    color: 'white',
+    color: 'white', 
     fontWeight: 'bold',
   },
 
@@ -143,7 +145,7 @@ export const styles = StyleSheet.create({
     elevation: 10,
   },
   bottomCard: {
-    backgroundColor: '#B0D3F5', // Azul claro
+    backgroundColor: 'rgba(13, 71, 161, 0.4)', // Azul claro
     borderRadius: 15,
     paddingVertical: 15,
     paddingHorizontal: 10,
@@ -151,6 +153,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     height: 100, // Altura fija
+
   },
   bottomCardIcon: {
     width: 40, // Tamaño de los iconos
