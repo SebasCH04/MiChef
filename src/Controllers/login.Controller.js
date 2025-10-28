@@ -68,39 +68,39 @@ console.log("Tipo de usuario:", tipo);
   });
 };
 
-// const enviarCorreo = async (email) => {
-//     let nombre = "";
-//     const querySnapshot = await getDocs(collection(db, "Usuarios"));
+const enviarCorreo = async (email) => {
+    let nombre = "";
+    const querySnapshot = await getDocs(collection(db, "Usuarios"));
 
-//     for (const doc of querySnapshot.docs) {
-//       const datos = doc.data();
-//       if (datos.correo.toLowerCase() === email.toLowerCase()) {
-//         nombre = datos.nombre;
-//       }
-//     }
+    for (const doc of querySnapshot.docs) {
+      const datos = doc.data();
+      if (datos.correo.toLowerCase() === email.toLowerCase()) {
+        nombre = datos.nombre;
+      }
+    }
 
-//     console.log("Nombre del usuario:", nombre);
+    console.log("Nombre del usuario:", nombre);
     
-//     await transporter.sendMail({
-//       from: 'Inicio seccion <salascordero2003@gmail.com>',
-//       to: email,
-//       subject: "Inicio seccion",
-//       text: "Te informamos que tu sesión ha sido iniciada.",
-//       html: `
-//           <div style="font-family: Arial, sans-serif; color: #333;">
-//             <h1 style="color: #007bff;">¡Bienvenido(a) al sistema!</h1>
-//             <p>Hola, <strong>${nombre}</strong>,</p>
-//             <p>Nos alegra que formes parte de nuestra plataforma.</p>
-//             <p>A partir de ahora podrás acceder a todas las funcionalidades que hemos preparado para ti.</p>
-//             <p>Si tienes alguna duda o necesitas ayuda, no dudes en contactarnos.</p>
-//             <br>
-//             <p>¡Te deseamos mucho éxito!</p>
-//             <p>— El equipo de ApProyect</p>
-//           </div>
-//         `
-//     });
+    await transporter.sendMail({
+      from: 'Inicio seccion <salascordero2003@gmail.com>',
+      to: email,
+      subject: "Inicio seccion",
+      text: "Te informamos que tu sesión ha sido iniciada.",
+      html: `
+          <div style="font-family: Arial, sans-serif; color: #333;">
+            <h1 style="color: #007bff;">¡Bienvenido(a) al sistema!</h1>
+            <p>Hola, <strong>${nombre}</strong>,</p>
+            <p>Nos alegra que formes parte de nuestra plataforma.</p>
+            <p>A partir de ahora podrás acceder a todas las funcionalidades que hemos preparado para ti.</p>
+            <p>Si tienes alguna duda o necesitas ayuda, no dudes en contactarnos.</p>
+            <br>
+            <p>¡Te deseamos mucho éxito!</p>
+            <p>— El equipo de ApProyect</p>
+          </div>
+        `
+    });
     
-// }
+}
 
 
 
