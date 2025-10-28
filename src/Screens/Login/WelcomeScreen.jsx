@@ -1,37 +1,24 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-// Importamos 'styles' de forma genérica ya que el usuario ajustará la ruta y el contenido.
 import { styles } from '../../Style/Login/WelcomeStyle.js'; 
 
 
 const WelcomeScreen = ({ navigation }) => {
 
     const handleIngresarPress = () => {
-        // Asegúrate de que 'login' sea el nombre correcto de la ruta en tu navegador
         navigation.navigate('login'); 
     };
 
     return (
         <SafeAreaProvider>
-            {/*
-            PROBLEMA SOLUCIONADO: 
-            1. Eliminamos 'importantForAccessibility="yes"' del SafeAreaView. 
-            2. Usamos 'importantForAccessibility="no"' en el contenedor que solo agrupa.
-            3. Nos aseguramos de que solo los elementos de texto e interactivos estén 
-               explícitamente marcados para accesibilidad.
-            */}
             <SafeAreaView 
                 style={styles.safeArea}
                 // Permite al lector de pantalla determinar el orden de enfoque.
             >
                 <View style={styles.container}>
-                    {/* HEADER: Título de la Aplicación
-                        Aseguramos que solo el texto sea el foco, no el View contenedor.
-                    */}
                     <View
                         style={styles.header}
-                        // Quitamos 'accessible={true}' del View para evitar que agrupe su contenido.
                     >
                         <Text 
                             style={styles.headerText}
@@ -54,7 +41,7 @@ const WelcomeScreen = ({ navigation }) => {
                             accessible={true}
                             accessibilityRole="header"
                             accessibilityLevel={1}
-                            accessibilityLabel="Encabezado principal. Bienvenido a MiChef" // Descripción más clara
+                            accessibilityLabel="Encabezado principal. Bienvenido a MiChef" 
                         >
                             Bienvenido a MiChef
                         </Text>

@@ -2,7 +2,12 @@ import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { styles } from '../../Style/Login/RecoverPasswordStyle.js';
 
+
+
 const RecoverPasswordScreen = ({ navigation }) => {
+  const handleConfirmPress = () => {
+    navigation.navigate('verificationCode');
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps='handled'>
@@ -50,7 +55,7 @@ const RecoverPasswordScreen = ({ navigation }) => {
           accessibilityLabel="Confirmar la solicitud de recuperación de contraseña"
           accessibilityHint="Pulsa para enviar el enlace de cambio de contraseña a tu correo"
           accessibilityRole="button"
-          onPress={() => console.log('Confirmar recuperación')}
+          onPress={() => handleConfirmPress()}
         >
           <Text style={styles.buttonText}>Confirmar</Text>
         </TouchableOpacity>
@@ -62,7 +67,7 @@ const RecoverPasswordScreen = ({ navigation }) => {
           accessibilityLabel="Regresar a la pantalla anterior, como iniciar sesión"
           accessibilityHint="Pulsa para cancelar y volver a la pantalla anterior"
           accessibilityRole="button"
-          onPress={() => console.log('Regresar')}
+          onPress={() => { console.log('Regresar'); console.log("Hola") }}
         >
           <Text style={styles.buttonText}>Regresar</Text>
         </TouchableOpacity>

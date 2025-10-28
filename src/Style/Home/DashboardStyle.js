@@ -70,7 +70,9 @@ export const styles = StyleSheet.create({
     fontWeight: '500',
   },
   activeFilterButton: {
-    backgroundColor: '#2196F3', // Azul para el activo (o el que uses)
+    backgroundColor: '#0d47a1', // Azul para el activo (o el que uses)
+    borderColor: 'black',
+    borderWidth: 2,
   },
   activeFilterButtonText: {
     color: 'white',

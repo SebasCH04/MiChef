@@ -36,7 +36,6 @@ const handleLoginPress = () => {
                     placeholder="ejemplo@correo.com"
                     accessibilityLabel="Introduce tu correo electrónico"
                     accessibilityHint="Campo de texto para el correo electrónico"
-                    accessibilityRole="textbox"
                 />
 
                 {/* Campo de Contraseña */}
@@ -47,7 +46,6 @@ const handleLoginPress = () => {
                     placeholder="Escribe tu contraseña"
                     accessibilityLabel="Introduce tu contraseña"
                     accessibilityHint="Campo de texto seguro para la contraseña"
-                    accessibilityRole="textbox"
                 />
 
                 {/* Enlace para recuperar contraseña */}
