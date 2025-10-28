@@ -107,6 +107,10 @@ const DashboardScreen = ({ navigation }) => {
       </TouchableOpacity>
     );
   };
+
+  const handleProfilePress = () => {
+    navigation.navigate('userdata');
+  };
   // -----------------------------
 
   return (
@@ -117,7 +121,7 @@ const DashboardScreen = ({ navigation }) => {
           <Text style={styles.headerTitle}>MiChef</Text>
           <TouchableOpacity 
             style={styles.profileIconContainer} 
-            onPress={() => console.log('Perfil presionado')}
+            onPress={() => handleProfilePress()}
             accessibilityRole="button"
             accessibilityLabel="Abrir perfil del usuario"
             accessible={true}

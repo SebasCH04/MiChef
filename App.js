@@ -4,7 +4,7 @@ import { NavigationContainer, createNavigationContainerRef } from '@react-naviga
 import { createStackNavigator } from '@react-navigation/stack';
 
 // Componentes y Servicios
-// import SessionTimeout from './src/Services/sessionTimeout '; // ELIMINADO
+// Modulos de Login y Registro
 import WelcomeScreen from './src/Screens/Login/WelcomeScreen'; 
 import LoginScreen from './src/Screens/Login/LoginScreen'; 
 import RegisterScreen from './src/Screens/Login/RegisterScreen'; 
@@ -12,9 +12,9 @@ import RecoverPasswordScreen from './src/Screens/Login/RecoverPasswordScreen';
 import VerificationCodeScreen from './src/Screens/Login/VerificationCodeScreen';
 import ChangePasswordScreen from './src/Screens/Login/ChangePasswordScreen';
 
-
-
+// Modulos de Home
 import Dashboard from './src/Screens/Home/DashboardScreen';
+import UserDataScreen from './src/Screens/Home/UserDataScreen';
 
 const Stack = createStackNavigator();
 
@@ -48,6 +48,7 @@ export default function App() {
 
         {/* Home Screens */}
         <Stack.Screen name="home" component={Dashboard} />
+        <Stack.Screen name="userdata" component={UserDataScreen} />
           
       </Stack.Navigator>
     </NavigationContainer>
