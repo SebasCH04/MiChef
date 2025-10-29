@@ -11,15 +11,12 @@ export const styles = StyleSheet.create({
   },
   // Header
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#FF8C00', // Naranja
-    paddingHorizontal: 15,
-    paddingVertical: Platform.OS === 'ios' ? 10 : 15, // Ajuste para iOS (notch)
-    borderBottomLeftRadius: 10,
-    borderBottomRightRadius: 10,
-    height: 65, // Altura fija
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 15,
+        paddingVertical: 10,
+        backgroundColor: '#FF8C00', // Naranja Fuerte
   },
   headerTitle: {
     fontSize: 24,

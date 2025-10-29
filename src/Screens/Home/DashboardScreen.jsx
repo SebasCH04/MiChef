@@ -111,6 +111,14 @@ const DashboardScreen = ({ navigation }) => {
   const handleProfilePress = () => {
     navigation.navigate('userdata');
   };
+
+  const handleRecipeManagerPress = () => {
+    navigation.navigate('recipeManager');
+  };
+
+  const handleAICulinaryPress = () => {
+    navigation.navigate('AICulinary');
+  }
   // -----------------------------
 
   return (
@@ -221,7 +229,7 @@ const DashboardScreen = ({ navigation }) => {
         <View style={styles.bottomButtonsContainer}>
           <TouchableOpacity 
             style={styles.bottomCard} 
-            onPress={() => console.log('Gestor de Recetas')}
+            onPress={() => handleRecipeManagerPress()}
             accessibilityRole="button"
             accessibilityLabel="Abrir Gestor de Recetas"
             accessible={true}
@@ -236,7 +244,7 @@ const DashboardScreen = ({ navigation }) => {
           </TouchableOpacity>
           <TouchableOpacity 
             style={styles.bottomCard} 
-            onPress={() => console.log('Asistente Culinario')}
+            onPress={() => handleAICulinaryPress()}
             accessibilityRole="button"
             accessibilityLabel="Abrir Asistente Culinario con Inteligencia Artificial"
             accessible={true}

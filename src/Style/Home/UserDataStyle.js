@@ -83,7 +83,7 @@ export const styles = StyleSheet.create({
 
     // Botones Flotantes Inferiores
     bottomButtonsContainer: {
-        marginBottom: 230,
+        marginBottom: 200,
         flexDirection: 'row',
         justifyContent: 'space-around',
         paddingHorizontal: 15,

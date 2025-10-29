@@ -1,5 +1,15 @@
 {
   "expo": {
+    "plugins": [
+      [
+        "@react-native-voice/voice",
+        {
+          "microphonePermission": "Allow MiChef to access your microphone for voice commands.",
+          "speechRecognitionPermission": "Allow MiChef to use speech recognition for voice commands."
+        }
+      ],
+      "expo-speech-recognition"
+    ],
     "cli": {
       "appVersionSource": "nativeVersion"
     },
@@ -16,14 +26,22 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "MiChef necesita acceso al micrófono para los comandos de voz.",
+        "NSSpeechRecognitionUsageDescription": "MiChef necesita reconocimiento de voz para procesar tus comandos."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/LogoTec.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.prototipo.michef"
+      "package": "com.prototipo.michef",
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.INTERNET"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"

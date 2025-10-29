@@ -15,6 +15,12 @@ import ChangePasswordScreen from './src/Screens/Login/ChangePasswordScreen';
 // Modulos de Home
 import Dashboard from './src/Screens/Home/DashboardScreen';
 import UserDataScreen from './src/Screens/Home/UserDataScreen';
+import RecipeManagerScreen from './src/Screens/Home/RecipeManagerScreen';
+
+// Modulo de AI
+import AICulinaryScreen from './src/Screens/AI/AICulinaryScreen';
+import AIChatScreen from './src/Screens/AI/AIChatScreen';
+import AIDemoRecipesScreen from './src/Screens/AI/AIDemoRecipesScreen';
 
 const Stack = createStackNavigator();
 
@@ -49,6 +55,13 @@ export default function App() {
         {/* Home Screens */}
         <Stack.Screen name="home" component={Dashboard} />
         <Stack.Screen name="userdata" component={UserDataScreen} />
+        <Stack.Screen name="recipeManager" component={RecipeManagerScreen} />
+
+
+        {/* AI Culinary Screen */}
+        <Stack.Screen name="AICulinary" component={AICulinaryScreen} />
+        <Stack.Screen name="AIChatScreen" component={AIChatScreen} />
+        <Stack.Screen name='AIDemoRecipes' component={AIDemoRecipesScreen} />
           
       </Stack.Navigator>
     </NavigationContainer>
