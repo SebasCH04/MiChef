@@ -59,6 +59,21 @@ export const styles = StyleSheet.create({
     fontSize: 16,
   },
 
+  // Input con error
+  inputError: {
+    borderColor: '#d32f2f', // Rojo para indicar error
+    borderWidth: 2,
+  },
+
+  // Texto de error
+  errorText: {
+    color: '#d32f2f', // Rojo
+    fontSize: 12,
+    marginTop: 4,
+    marginBottom: 5,
+    fontStyle: 'italic',
+  },
+
   // Contenedor del Picker (para darle un borde y fondo)
   pickerContainer: {
     backgroundColor: '#ffffff', // Blanco

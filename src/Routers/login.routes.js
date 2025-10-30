@@ -1,8 +1,11 @@
-import {Router} from "express"
-import {postLogin} from "../Controllers/login.Controller.js"
+import { Router } from "express";
+import { loginController } from "../Controllers/login.Controller.js";
 
-const router = Router()
+const router = Router();
 
-router.post("/login", postLogin);
+// Autenticación
+router.post("/login", loginController.login);
+router.post("/register", loginController.register);
+router.post("/recover-password", loginController.recoverPassword);
 
 export default router;

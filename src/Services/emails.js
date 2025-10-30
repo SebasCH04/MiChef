@@ -4,11 +4,14 @@ import nodemailer from "nodemailer";
 export const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 465,
-    secure: true, // true for port 465, false for other ports
+    secure: true,
     auth: {
-        user: ".com",
-        pass: "gazl jpno facl iuqv",
+        user: "sebasch04@gmail.com", // Reemplaza con tu correo de Gmail
+        pass: "dipb zkyy rjce fspd", // Reemplaza con la contraseña de aplicación que generaste
     },
+    tls: {
+        rejectUnauthorized: true
+    }
 });
 
 transporter.verify().then(() => {
