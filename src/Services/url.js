@@ -21,7 +21,7 @@ const getServerURL = () => {
     
     // Fallback: usar IP local (solo funciona en la misma WiFi)
     console.log('No se detectó Expo Tunnel, usando IP local');
-    return 'http://172.28.205.194';
+    return 'http://10.31.193.169';
 };
 
 const URL = getServerURL();
