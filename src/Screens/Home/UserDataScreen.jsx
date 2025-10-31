@@ -1,154 +1,169 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   View, 
   Text, 
   TouchableOpacity, 
   ScrollView, 
-  StyleSheet, 
-  Platform 
+  ActivityIndicator 
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { MaterialCommunityIcons } from '@expo/vector-icons'; 
-
 import { styles } from '../../Style/Home/UserDataStyle.js';
-
-
-const STATIC_USER_DATA = {
-    username: 'Kevin Jiménez',
-    email: 'kevin201560@estudiantec.cr',
-    knowledgeLevel: 'Bajo',
-    dietType: 'Sin dieta',
-    allergies: 'Sin padecimiento',
-    ingredientsToAvoid: ['Arroz', 'Aguacate'],
-};
+import URL from '../../Services/url.js';
 
 const UserDataScreen = ({ navigation }) => {
-    const renderDataRow = (label, value) => {
-        const accessibilityLabel = `${label} ${value}`;
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-        return (
-            <View 
-                style={styles.dataRow}
-                accessible={true} 
-                accessibilityLabel={accessibilityLabel} // Etiqueta combinada
-            >
-                {/* 2. Ocultamos los textos individuales para que el lector solo lea la etiqueta del padre */}
-                <Text style={styles.dataLabel} accessibilityElementsHidden={true}>{label}</Text>
-                <Text style={styles.dataValue} accessibilityElementsHidden={true}>{value}</Text>
-            </View>
-        );
+  const usuario_id = 6; // ID de usuario fijo para pruebas
+
+  const API_URL = `${URL}:3000/home/userData`;
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch(`${API_URL}?usuario_id=${usuario_id}`);
+        const data = await response.json();
+        if (data.success) {
+          setUserData(data.data);
+        } else {
+          setError('No se pudieron obtener los datos del usuario');
+        }
+      } catch (err) {
+        console.error('Error al obtener datos del usuario:', err);
+        setError('Error al conectar con el servidor');
+      } finally {
+        setLoading(false);
+      }
     };
 
-    // Helper para renderizar los ingredientes a evitar de forma accesible
-    const renderAvoidIngredients = (ingredients) => {
-        // Crea una cadena clara: "Ingredientes a evitar: Arroz, Aguacate"
-        const listText = ingredients.join(', '); 
-        const accessibilityLabel = `Ingredientes a evitar: ${listText}`;
-        
-        return (
-            <View accessible={true} accessibilityLabel={accessibilityLabel}>
-                <Text style={styles.dataLabel} accessibilityElementsHidden={true}>Ingredientes a evitar:</Text>
-                
-                <View style={styles.avoidIngredientsList}>
-                    {/* Ocultamos los textos individuales para evitar duplicidad */}
-                    {ingredients.map((item, index) => (
-                        <Text key={index} style={styles.dataValue} accessibilityElementsHidden={true}>
-                            {item}
-                        </Text>
-                    ))}
-                </View>
-            </View>
-        );
-    };
+    fetchUserData();
+  }, []);
 
-    const handleChangePasswordPress = () => {
-        navigation.navigate('recoverPassword');
-    };
-
-    const handleEditProfilePress = () => {
-        navigation.navigate('registroPage', { isEditing: true });
-    };
-
+  // 🔹 Renderizar fila de datos
+  const renderDataRow = (label, value) => {
+    const accessibilityLabel = `${label} ${value}`;
     return (
-        <SafeAreaView style={styles.safeArea}>
-            {/* Header con accesibilidad de título */}
-            <View 
-                style={styles.header}
-                accessible={true}
-                accessibilityRole="header"
-                accessibilityLabel="MiChef aplicación"
-            >
-                <Text style={styles.headerTitle}>MiChef</Text>
-            </View>
-
-            <ScrollView contentContainerStyle={styles.scrollContent}>
-                {/* Título de sección con accesibilidad de cabecera */}
-                <Text 
-                    style={styles.sectionTitle}
-                    accessibilityRole="header"
-                    accessible={true}
-                    accessibilityLabel="Mis Datos de Usuario"
-                >
-                    Mis Datos
-                </Text>
-
-                {/* Contenedor de Datos del Usuario (el recuadro amarillo) */}
-                <View style={styles.dataContainer}>
-                    {renderDataRow("Nombre de usuario:", STATIC_USER_DATA.username)}
-                    {renderDataRow("Correo electrónico:", STATIC_USER_DATA.email)}
-                    
-                    {/* Nivel de conocimiento: Accesibilidad manual debido a la estructura de la imagen */}
-                    <View accessible={true} accessibilityLabel={`Nivel de conocimiento en la cocina: ${STATIC_USER_DATA.knowledgeLevel}`}>
-                        <Text style={styles.dataLabel} accessibilityElementsHidden={true}>Nivel de conocimiento en la cocina:</Text>
-                        <Text style={styles.dataValue} accessibilityElementsHidden={true}>{STATIC_USER_DATA.knowledgeLevel}</Text>
-                    </View>
-
-                    {renderDataRow("Tipo de dieta:", STATIC_USER_DATA.dietType)}
-                    {renderDataRow("Tipo de alergias:", STATIC_USER_DATA.allergies)}
-                    
-                    {renderAvoidIngredients(STATIC_USER_DATA.ingredientsToAvoid)}
-
-                                    {/* Enlace para cambiar contraseña con accesibilidad adecuada */}
-                <TouchableOpacity 
-                    style={styles.passwordChangeLink}
-                    onPress={() => handleChangePasswordPress()}
-                    accessibilityRole="link"
-                    accessibilityLabel="Cambiar de contraseña"
-                    accessible={true}
-                >
-                    <Text style={styles.passwordChangeText}>
-                        Cambiar de contraseña
-                    </Text>
-                </TouchableOpacity>
-                </View>
-
-
-
-            </ScrollView>
-
-            {/* Botones Flotantes Inferiores con labels descriptivas */}
-            <View style={styles.bottomButtonsContainer}>
-                <TouchableOpacity 
-                    style={styles.actionButton} 
-                    onPress={() => handleEditProfilePress()}
-                    accessibilityRole="button"
-                    accessibilityLabel="Botón Actualizar datos"
-                    accessible={true}
-                >
-                    <Text style={styles.actionButtonText}>Actualizar datos</Text>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                    style={styles.cancelButton} 
-                    onPress={() => console.log('Cancelar presionado')}
-                    accessibilityRole="button"
-                    accessibilityLabel="Botón Cancelar y volver"
-                    accessible={true}
-                >
-                    <Text style={styles.cancelButtonText}>Cancelar</Text>
-                </TouchableOpacity>
-            </View>
-        </SafeAreaView>
+      <View style={styles.dataRow} accessible={true} accessibilityLabel={accessibilityLabel}>
+        <Text style={styles.dataLabel} accessibilityElementsHidden={true}>{label}</Text>
+        <Text style={styles.dataValue} accessibilityElementsHidden={true}>{value}</Text>
+      </View>
     );
+  };
+
+  // 🔹 Renderizar ingredientes a evitar
+  const renderAvoidIngredients = (ingredientsString) => {
+    const ingredients = ingredientsString ? ingredientsString.split(',').map(i => i.trim()) : [];
+    const accessibilityLabel = `Ingredientes a evitar: ${ingredients.join(', ')}`;
+    
+    return (
+      <View accessible={true} accessibilityLabel={accessibilityLabel}>
+        <Text style={styles.dataLabel} accessibilityElementsHidden={true}>Ingredientes a evitar:</Text>
+        <View style={styles.avoidIngredientsList}>
+          {ingredients.map((item, index) => (
+            <Text key={index} style={styles.dataValue} accessibilityElementsHidden={true}>
+              {item}
+            </Text>
+          ))}
+        </View>
+      </View>
+    );
+  };
+
+  const handleChangePasswordPress = () => {
+    navigation.navigate('recoverPassword');
+  };
+
+  const handleEditProfilePress = () => {
+    navigation.navigate('registroPage', { isEditing: true });
+  };
+
+  // 🔹 Si está cargando
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#FACC15" />
+        <Text>Cargando datos del usuario...</Text>
+      </View>
+    );
+  }
+
+  // 🔹 Si hubo error
+  if (error) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text style={{ color: 'red', fontSize: 16 }}>{error}</Text>
+      </View>
+    );
+  }
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      {/* Header */}
+      <View 
+        style={styles.header}
+        accessible={true}
+        accessibilityRole="header"
+        accessibilityLabel="MiChef aplicación"
+      >
+        <Text style={styles.headerTitle}>MiChef</Text>
+      </View>
+
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Text 
+          style={styles.sectionTitle}
+          accessibilityRole="header"
+          accessible={true}
+          accessibilityLabel="Mis Datos de Usuario"
+        >
+          Mis Datos
+        </Text>
+
+        {/* 🔸 Contenedor principal */}
+        <View style={styles.dataContainer}>
+          {renderDataRow("Nombre de usuario:", userData.username)}
+          {renderDataRow("Correo electrónico:", userData.email)}
+          {renderDataRow("Nivel de conocimiento:", userData.knowledgeLevel)}
+          {renderDataRow("Tipo de dieta:", userData.dietType)}
+          {renderDataRow("Tipo de alergias:", userData.allergies)}
+          {renderAvoidIngredients(userData.ingredientsToAvoid)}
+
+          {/* 🔸 Cambiar contraseña */}
+          <TouchableOpacity 
+            style={styles.passwordChangeLink}
+            onPress={handleChangePasswordPress}
+            accessibilityRole="link"
+            accessibilityLabel="Cambiar contraseña"
+            accessible={true}
+          >
+            <Text style={styles.passwordChangeText}>Cambiar contraseña</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+
+      {/* 🔸 Botones inferiores */}
+      <View style={styles.bottomButtonsContainer}>
+        <TouchableOpacity 
+          style={styles.actionButton} 
+          onPress={handleEditProfilePress}
+          accessibilityRole="button"
+          accessibilityLabel="Botón Actualizar datos"
+          accessible={true}
+        >
+          <Text style={styles.actionButtonText}>Actualizar datos</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.cancelButton} 
+          onPress={() => navigation.goBack()}
+          accessibilityRole="button"
+          accessibilityLabel="Botón Cancelar y volver"
+          accessible={true}
+        >
+          <Text style={styles.cancelButtonText}>Cancelar</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
+  );
 };
 
 export default UserDataScreen;

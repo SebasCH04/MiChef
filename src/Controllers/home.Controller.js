@@ -63,3 +63,20 @@ export const searchAllRecipes = async (req, res) => {
         return res.status(500).json({ success: false, message: 'Error al buscar recetas', error: error.message });
     }
 };
+
+export const getUserData = async (req, res) => {
+    const { usuario_id } = req.query;
+    if (!usuario_id) {
+        return res.status(400).json({ success: false, message: 'Falta el ID de usuario' });
+    }
+    try {
+        const pool = await getConnection();
+        const request = await pool.request();
+        request.input('usuario_id', sql.Int, usuario_id);
+        const result = await request.execute('sp_GetUserData');
+        res.json({ success: true, data: result.recordset[0] });
+    } catch (error) {
+        console.error('Error al obtener datos del usuario:', error);
+        return res.status(500).json({ success: false, message: 'Error al obtener datos del usuario', error: error.message });
+    }
+};
