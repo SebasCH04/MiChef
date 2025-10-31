@@ -45,3 +45,20 @@ export const toggleFavorite = async (req, res) => {
         return res.status(500).json({ success: false, message: 'Error al alternar favorito', error: error.message });
     }
 };
+
+export const searchAllRecipes = async (req, res) => {
+    const { searchTerm } = req.query || '';
+    if (!searchTerm) {
+        return res.status(400).json({ success: false, message: 'Falta el término de búsqueda' });
+    }
+    try{
+        const pool = await getConnection();
+        const request = await pool.request();
+        request.input('searchTerm', sql.NVarChar(100), `%${searchTerm}%`);
+        const result = await request.execute('sp_SearchAllRecipes');
+        res.json({ success: true, data: result.recordset });
+    } catch (error) {
+        console.error('Error al buscar recetas:', error);
+        return res.status(500).json({ success: false, message: 'Error al buscar recetas', error: error.message });
+    }
+};

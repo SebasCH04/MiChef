@@ -23,19 +23,15 @@ const DashboardScreen = ({ navigation }) => {
   const [activeFilter, setActiveFilter] = useState('Favoritos');
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(false);
-
- const usuario_id = 9;
-
+  const usuario_id = 9;
 
   const fetchRecommendations = async () => {
     try {
       setLoading(true);
-      const response = await fetch(
-        `${API_URL}/recommendations?usuario_id=${usuario_id}&filterType=${activeFilter}` );
+      const response = await fetch(`${API_URL}/recommendations?usuario_id=${usuario_id}&filterType=${activeFilter}`);
       const data = await response.json();
 
       if (data.success) {
-
         const formatted = data.data.map(item => ({
           id: item.id,
           name: item.name,
@@ -61,7 +57,6 @@ const DashboardScreen = ({ navigation }) => {
     fetchRecommendations();
   }, [activeFilter]);
 
-
   const handleToggleFavorite = async (recipeId) => {
     try {
       const response = await fetch(`${API_URL}/toggleFavorite`, {
@@ -69,13 +64,10 @@ const DashboardScreen = ({ navigation }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ usuario_id, receta_id: recipeId }),
       });
-      console.log('Respuesta de toggleFavorite:', response);
-
       const data = await response.json();
 
       if (data.success && data.data?.length > 0) {
         const newFavoriteState = data.data[0].isFavorite;
-
         setRecommendations(prev =>
           prev.map(recipe =>
             recipe.id === recipeId
@@ -92,7 +84,6 @@ const DashboardScreen = ({ navigation }) => {
     }
   };
 
-
   const getFilteredRecommendations = () => {
     switch (activeFilter) {
       case 'MiDieta':
@@ -108,30 +99,67 @@ const DashboardScreen = ({ navigation }) => {
 
   const filteredRecommendations = getFilteredRecommendations();
 
-
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView
+      style={styles.safeArea}
+      accessible={true}
+      accessibilityLabel="Pantalla principal de MiChef con recomendaciones personalizadas"
+    >
       <View style={styles.container}>
+        
         {/* HEADER */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>MiChef</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('userdata')}>
+        <View 
+          style={styles.header}
+          accessible={true}
+          accessibilityRole="header"
+          accessibilityLabel="Encabezado MiChef"
+        >
+          <Text style={styles.headerTitle} accessibilityRole="text">MiChef</Text>
+          <TouchableOpacity 
+            onPress={() => navigation.navigate('userdata')}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel="Abrir perfil de usuario"
+            accessibilityHint="Muestra los datos de tu cuenta"
+          >
             <MaterialCommunityIcons name="account-circle" size={40} color="white" />
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.sectionTitle}>Recomendaciones para ti</Text>
+        {/* TÍTULO */}
+        <Text
+          style={styles.sectionTitle}
+          accessible={true}
+          accessibilityRole="header"
+        >
+          Recomendaciones para ti
+        </Text>
 
         {/* FILTROS */}
-        <View style={styles.filterContainer}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterButtonsScrollView}>
+        <View 
+          style={styles.filterContainer}
+          accessible={true}
+          accessibilityLabel="Filtros de recetas: Mi dieta, Mi nivel, Favoritos"
+        >
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.filterButtonsScrollView}
+          >
             {['MiDieta', 'MiNivel', 'Favoritos'].map(f => (
               <TouchableOpacity
                 key={f}
                 style={[styles.filterButton, activeFilter === f && styles.activeFilterButton]}
                 onPress={() => setActiveFilter(f)}
+                accessible={true}
+                accessibilityRole="button"
+                accessibilityLabel={`Filtrar por ${f === 'MiDieta' ? 'Mi dieta' : f === 'MiNivel' ? 'Mi nivel' : 'Favoritos'}`}
+                accessibilityHint={`Muestra solo las recetas correspondientes a ${f}`}
               >
-                <Text style={[styles.filterButtonText, activeFilter === f && styles.activeFilterButtonText]}>
+                <Text 
+                  style={[styles.filterButtonText, activeFilter === f && styles.activeFilterButtonText]}
+                  accessibilityRole="text"
+                >
                   {f === 'MiDieta' ? 'Mi Dieta' : f === 'MiNivel' ? 'Mi Nivel' : 'Favoritos'}
                 </Text>
               </TouchableOpacity>
@@ -141,15 +169,42 @@ const DashboardScreen = ({ navigation }) => {
 
         {/* CONTENIDO */}
         {loading ? (
-          <ActivityIndicator size="large" color="#000" style={{ marginTop: 40 }} />
+          <ActivityIndicator
+            size="large"
+            color="#000"
+            style={{ marginTop: 40 }}
+            accessible={true}
+            accessibilityLabel="Cargando recetas"
+          />
         ) : (
-          <ScrollView style={styles.recommendationsList} contentContainerStyle={styles.recommendationsListContent}>
+          <ScrollView
+            style={styles.recommendationsList}
+            contentContainerStyle={styles.recommendationsListContent}
+            accessible={true}
+            accessibilityLabel={`Lista de ${filteredRecommendations.length} recetas`}
+          >
             {filteredRecommendations.map((item) => (
-              <TouchableOpacity key={item.id} style={styles.recipeCard}>
+              <TouchableOpacity
+                key={item.id}
+                style={styles.recipeCard}
+                accessible={true}
+                accessibilityRole="button"
+                accessibilityLabel={`Receta ${item.name}`}
+                accessibilityHint={`Toca dos veces para abrir, para marcar como favorita hay un botón a continuación`}
+              >
                 {item.image ? (
-                  <Image source={item.image} style={styles.recipeImage} />
+                  <Image
+                    source={item.image}
+                    style={styles.recipeImage}
+                    accessible={true}
+                    accessibilityLabel={`Imagen de ${item.name}`}
+                  />
                 ) : (
-                  <View style={[styles.recipeImage, { backgroundColor: '#eee', justifyContent: 'center', alignItems: 'center' }]}>
+                  <View
+                    style={[styles.recipeImage, { backgroundColor: '#eee', justifyContent: 'center', alignItems: 'center' }]}
+                    accessible={true}
+                    accessibilityLabel="Imagen no disponible"
+                  >
                     <Text>No image</Text>
                   </View>
                 )}
@@ -164,6 +219,13 @@ const DashboardScreen = ({ navigation }) => {
                 <TouchableOpacity
                   style={styles.favoriteIcon}
                   onPress={() => handleToggleFavorite(item.id)}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel={item.isFavorite 
+                    ? `Quitar ${item.name} de favoritos`
+                    : `Agregar ${item.name} a favoritos`
+                  }
+                  accessibilityHint="Activa o desactiva el favorito"
                 >
                   <MaterialCommunityIcons
                     name={item.isFavorite ? "heart" : "heart-outline"}
@@ -175,7 +237,11 @@ const DashboardScreen = ({ navigation }) => {
             ))}
 
             {filteredRecommendations.length === 0 && !loading && (
-              <View style={styles.noResultsContainer}>
+              <View
+                style={styles.noResultsContainer}
+                accessible={true}
+                accessibilityLabel="No se encontraron recetas con este filtro"
+              >
                 <Text style={styles.noResultsText}>No se encontraron recetas con este filtro.</Text>
               </View>
             )}
@@ -183,14 +249,40 @@ const DashboardScreen = ({ navigation }) => {
         )}
 
         {/* BOTONES INFERIORES */}
-        <View style={styles.bottomButtonsContainer}>
-          <TouchableOpacity style={styles.bottomCard} onPress={() => navigation.navigate('recipeManager')}>
-            <Image source={GestorImage} style={styles.bottomCardIcon} />
+        <View
+          style={styles.bottomButtonsContainer}
+          accessible={true}
+          accessibilityLabel="Opciones adicionales"
+        >
+          <TouchableOpacity
+            style={styles.bottomCard}
+            onPress={() => navigation.navigate('recipeManager')}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel="Abrir gestor de recetas"
+            accessibilityHint="Te permite buscar y gestionar tus recetas"
+          >
+            <Image
+              source={GestorImage}
+              style={styles.bottomCardIcon}
+              accessible={false}
+            />
             <Text style={styles.bottomCardText}>Gestor de Recetas</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.bottomCard} onPress={() => navigation.navigate('AICulinary')}>
-            <Image source={IAImage} style={styles.bottomCardIcon} />
+          <TouchableOpacity
+            style={styles.bottomCard}
+            onPress={() => navigation.navigate('AICulinary')}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel="Abrir asistente culinario con inteligencia artificial"
+            accessibilityHint="Te ayuda a cocinar o sugerir recetas"
+          >
+            <Image
+              source={IAImage}
+              style={styles.bottomCardIcon}
+              accessible={false}
+            />
             <Text style={styles.bottomCardText}>Asistente Culinario</Text>
           </TouchableOpacity>
         </View>
