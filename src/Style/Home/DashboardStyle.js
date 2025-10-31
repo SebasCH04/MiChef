@@ -23,6 +23,18 @@ export const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'white',
   },
+  headerIcons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 15,
+  },
+  logoutButton: {
+    padding: 8,
+    minWidth: 40,
+    minHeight: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   profileIconContainer: {
     // Si necesitas algún estilo adicional para el contenedor del icono de perfil
   },

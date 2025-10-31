@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { styles } from '../../Style/Home/DashboardStyle.js'; 
 import GestorImage from '../../../assets/GestorImage.png';
 import IAImage from '../../../assets/IAImage.png';
@@ -99,6 +100,17 @@ const DashboardScreen = ({ navigation }) => {
 
   const filteredRecommendations = getFilteredRecommendations();
 
+  const handleLogout = async () => {
+    console.log('Cerrando sesión...');
+    try {
+      await AsyncStorage.removeItem('michef_user');
+      navigation.reset({ index: 0, routes: [{ name: 'login' }] });
+    } catch (error) {
+      console.error('=== LOGOUT: Error ===', error);
+      Alert.alert('Error', 'No se pudo cerrar sesión correctamente');
+    }
+  };
+
   return (
     <SafeAreaView
       style={styles.safeArea}
@@ -115,15 +127,33 @@ const DashboardScreen = ({ navigation }) => {
           accessibilityLabel="Encabezado MiChef"
         >
           <Text style={styles.headerTitle} accessibilityRole="text">MiChef</Text>
-          <TouchableOpacity 
-            onPress={() => navigation.navigate('userdata')}
+          <View style={styles.headerIcons}>
+            <TouchableOpacity 
+            
+              onPress={() => {
+                handleLogout();
+              }} 
+              style={styles.logoutButton}
+              accessibilityLabel="Cerrar sesión"
+              activeOpacity={0.7}
+            >
+              <MaterialCommunityIcons name="logout" size={28} color="white" />
+            </TouchableOpacity>
+            <TouchableOpacity 
+              onPress={() => {
+                console.log('Profile button pressed!');
+                navigation.navigate('userdata');
+              }}
+              activeOpacity={0.7}
+            
             accessible={true}
             accessibilityRole="button"
             accessibilityLabel="Abrir perfil de usuario"
             accessibilityHint="Muestra los datos de tu cuenta"
           >
-            <MaterialCommunityIcons name="account-circle" size={40} color="white" />
-          </TouchableOpacity>
+              <MaterialCommunityIcons name="account-circle" size={40} color="white" />
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* TÍTULO */}

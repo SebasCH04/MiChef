@@ -64,6 +64,17 @@ export const styles = StyleSheet.create({
     marginBottom: 15,
   },
 
+  // Errores de validación
+  inputError: {
+    borderColor: '#ff5252',
+  },
+  errorText: {
+    color: '#ff5252',
+    marginTop: -10,
+    marginBottom: 10,
+    fontSize: 12,
+  },
+
   // Enlace de "¿No recuerda su contraseña?"
   forgotPasswordContainer: {
     flexDirection: 'row',
