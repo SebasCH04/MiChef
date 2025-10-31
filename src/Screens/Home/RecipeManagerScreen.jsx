@@ -36,7 +36,7 @@ const RecipeManagerScreen = ({ navigation }) => {
 
     try {
       setLoading(true);
-      const response = await fetch(`${API_URL}?searchTerm=${encodeURIComponent(term)}`);
+      const response = await fetch(`${API_URL}?usuario_id=${usuario_id}&searchTerm=${encodeURIComponent(term)}`);
       const data = await response.json();
 
       if (data.success && Array.isArray(data.data)) {

@@ -47,13 +47,14 @@ export const toggleFavorite = async (req, res) => {
 };
 
 export const searchAllRecipes = async (req, res) => {
-    const { searchTerm } = req.query || '';
-    if (!searchTerm) {
+    const { usuario_id, searchTerm } = req.query || '';
+    if (!searchTerm || !usuario_id) {
         return res.status(400).json({ success: false, message: 'Falta el término de búsqueda' });
     }
     try{
         const pool = await getConnection();
         const request = await pool.request();
+        request.input('usuario_id', sql.Int, usuario_id);
         request.input('searchTerm', sql.NVarChar(100), `%${searchTerm}%`);
         const result = await request.execute('sp_SearchAllRecipes');
         res.json({ success: true, data: result.recordset });
