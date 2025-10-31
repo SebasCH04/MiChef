@@ -46,7 +46,8 @@ const LoginScreen = ( { navigation } ) => {
         try {
             const axiosConfig = {
                 timeout: 30000,
-                headers: { 'Content-Type': 'application/json' }
+                headers: { 'Content-Type': 'application/json' },
+                validateStatus: (status) => status < 500,
             };
 
             const payload = { email: email.toLowerCase(), password };
@@ -70,7 +71,6 @@ const LoginScreen = ( { navigation } ) => {
                         setAuthError('Credenciales inválidas. Verifica tu correo y contraseña.');
             }
         } catch (error) {
-            console.error('Login error:', error?.message, error?.response?.data);
             if (error.code === 'ECONNABORTED' || (error.message || '').includes('timeout')) {
                         setAuthError('Tiempo agotado al contactar el servidor. Intenta nuevamente.');
             } else if (error.response?.status === 401) {
