@@ -128,8 +128,22 @@ const DashboardScreen = ({ navigation }) => {
         >
           <Text style={styles.headerTitle} accessibilityRole="text">MiChef</Text>
           <View style={styles.headerIcons}>
+            {/* Primero el perfil */}
             <TouchableOpacity 
-            
+              onPress={() => {
+                console.log('Profile button pressed!');
+                navigation.navigate('userdata');
+              }}
+              activeOpacity={0.7}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel="Abrir perfil de usuario"
+              accessibilityHint="Muestra los datos de tu cuenta"
+            >
+              <MaterialCommunityIcons name="account-circle" size={40} color="white" />
+            </TouchableOpacity>
+            {/* Luego el logout, a la derecha */}
+            <TouchableOpacity 
               onPress={() => {
                 handleLogout();
               }} 
@@ -138,20 +152,6 @@ const DashboardScreen = ({ navigation }) => {
               activeOpacity={0.7}
             >
               <MaterialCommunityIcons name="logout" size={28} color="white" />
-            </TouchableOpacity>
-            <TouchableOpacity 
-              onPress={() => {
-                console.log('Profile button pressed!');
-                navigation.navigate('userdata');
-              }}
-              activeOpacity={0.7}
-            
-            accessible={true}
-            accessibilityRole="button"
-            accessibilityLabel="Abrir perfil de usuario"
-            accessibilityHint="Muestra los datos de tu cuenta"
-          >
-              <MaterialCommunityIcons name="account-circle" size={40} color="white" />
             </TouchableOpacity>
           </View>
         </View>
