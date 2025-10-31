@@ -23,7 +23,7 @@ const pool = new sql.ConnectionPool(dbConfig);
 let poolConnect = null;
 
 // Función para obtener la conexión
-async function getConnection() {
+export async function getConnection() {
     try {
         if (!poolConnect) {
             console.log('Iniciando conexión a Azure SQL Database...');
@@ -73,5 +73,7 @@ process.on('SIGINT', () => {
 
 export default {
     executeQuery,
-    pool
+    pool,
+    getConnection
 };
+
