@@ -3,7 +3,7 @@ import { getRecomendations, toggleFavorite } from '../Controllers/home.Controlle
 
 const router = express.Router();
 
-router.get('/recomendations', getRecomendations);
+router.get('/recommendations', getRecomendations);
 router.post('/toggleFavorite', toggleFavorite);
 
 export default router;
