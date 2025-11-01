@@ -39,7 +39,7 @@ const UserDataScreen = ({ navigation }) => {
     fetchUserData();
   }, []);
 
-  // 🔹 Renderizar fila de datos
+  
   const renderDataRow = (label, value) => {
     const accessibilityLabel = `${label} ${value}`;
     return (
@@ -50,7 +50,6 @@ const UserDataScreen = ({ navigation }) => {
     );
   };
 
-  // 🔹 Renderizar ingredientes a evitar
   const renderAvoidIngredients = (ingredientsString) => {
     const ingredients = ingredientsString ? ingredientsString.split(',').map(i => i.trim()) : [];
     const accessibilityLabel = `Ingredientes a evitar: ${ingredients.join(', ')}`;
@@ -77,7 +76,7 @@ const UserDataScreen = ({ navigation }) => {
     navigation.navigate('registroPage', { isEditing: true });
   };
 
-  // 🔹 Si está cargando
+
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -87,7 +86,7 @@ const UserDataScreen = ({ navigation }) => {
     );
   }
 
-  // 🔹 Si hubo error
+
   if (error) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -118,7 +117,6 @@ const UserDataScreen = ({ navigation }) => {
           Mis Datos
         </Text>
 
-        {/* 🔸 Contenedor principal */}
         <View style={styles.dataContainer}>
           {renderDataRow("Nombre de usuario:", userData.username)}
           {renderDataRow("Correo electrónico:", userData.email)}
@@ -127,7 +125,6 @@ const UserDataScreen = ({ navigation }) => {
           {renderDataRow("Tipo de alergias:", userData.allergies)}
           {renderAvoidIngredients(userData.ingredientsToAvoid)}
 
-          {/* 🔸 Cambiar contraseña */}
           <TouchableOpacity 
             style={styles.passwordChangeLink}
             onPress={handleChangePasswordPress}
@@ -140,7 +137,6 @@ const UserDataScreen = ({ navigation }) => {
         </View>
       </ScrollView>
 
-      {/* 🔸 Botones inferiores */}
       <View style={styles.bottomButtonsContainer}>
         <TouchableOpacity 
           style={styles.actionButton} 
