@@ -1,6 +1,7 @@
 
 
 import sql from 'mssql';
+import bcrypt from 'bcrypt';
 import { executeQuery } from '../Services/azureDBConnect.js';
 import { getConnection } from '../Services/azureDBConnect.js';
 
@@ -80,3 +81,5 @@ export const getUserData = async (req, res) => {
         return res.status(500).json({ success: false, message: 'Error al obtener datos del usuario', error: error.message });
     }
 };
+
+

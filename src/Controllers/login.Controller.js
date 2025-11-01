@@ -32,7 +32,9 @@ export const loginController = {
                 user: {
                     id: user.id_usuario,
                     nombre: user.nombre,
-                    email: user.email
+                    email: user.email,
+                    tipo_dieta: user.tipo_dieta,
+                    nivel_cocina: user.nivel_cocina,
                 }
             });
 
@@ -253,3 +255,6 @@ const enviarCorreoRecuperacion = async (email, token) => {
         throw error;
     }
 };
+
+
+

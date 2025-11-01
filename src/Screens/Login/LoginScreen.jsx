@@ -52,14 +52,16 @@ const LoginScreen = ( { navigation } ) => {
 
             const payload = { email: email.toLowerCase(), password };
             const endpoint = `${URL}:3000/login`;
-            console.log('POST', endpoint, payload);
             const resp = await axios.post(endpoint, payload, axiosConfig);
 
-                    if (resp.data?.success) {
+            if (resp.data?.success) {
                 const user = resp.data.user;
+
+                console.log('Login exitoso:', user);
                 // Guardar sesión mínima
                 try {
                     await AsyncStorage.setItem('michef_user', JSON.stringify(user));
+                    console.log('Usuario guardado en AsyncStorage');
                 } catch (e) {
                     console.warn('No se pudo guardar el usuario en AsyncStorage', e);
                 }

@@ -17,18 +17,40 @@ import IAImage from '../../../assets/IAImage.png';
 import URL from '../../Services/url.js';
 
 const API_URL = `${URL}:3000/home`;
-const MY_DIET = 'Vegano';
-const MY_LEVEL = 'Medio';
+
+
 
 const DashboardScreen = ({ navigation }) => {
   const [activeFilter, setActiveFilter] = useState('Favoritos');
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(false);
-  const usuario_id = 9;
+  const [userData, setUserData] = useState(null);
 
+  useEffect(() => {
+    const loadUser = async () => {
+      try{
+        const storedUser = await AsyncStorage.getItem('michef_user');
+        if(storedUser){
+          const parsedUser = JSON.parse(storedUser);
+          setUserData(parsedUser);
+        }
+      } catch(err){
+        console.log("Error cargando usuario:", err);
+      }
+    }
+    loadUser();
+  }, []);
+
+
+  
+  const usuario_id = userData?.id;
   const fetchRecommendations = async () => {
+    
     try {
+      if(!userData) return;
+
       setLoading(true);
+      //console.log(usuario_id);
       const response = await fetch(`${API_URL}/recommendations?usuario_id=${usuario_id}&filterType=${activeFilter}`);
       const data = await response.json();
 
@@ -86,6 +108,9 @@ const DashboardScreen = ({ navigation }) => {
   };
 
   const getFilteredRecommendations = () => {
+    const MY_DIET = userData?.tipo_dieta;
+    const MY_LEVEL = userData?.nivel_cocina;
+    //console.log(MY_DIET, MY_LEVEL);
     switch (activeFilter) {
       case 'MiDieta':
         return recommendations.filter(r => r.diet === MY_DIET);

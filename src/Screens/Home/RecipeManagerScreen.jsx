@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -13,19 +13,41 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 import { styles } from '../../Style/Home/RecipeManagerStyle.js';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import URL from '../../Services/url.js'; 
+
 
 const RecipeManagerScreen = ({ navigation }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredRecipes, setFilteredRecipes] = useState([]);
   const [hasSearched, setHasSearched] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [userData, setUserData] = useState(null);
+  
 
-  const usuario_id = 9;
   const API_URL = `${URL}:3000/home/searchRecipes`;
   const FAVORITE_URL = `${URL}:3000/home/toggleFavorite`;
 
+
+  useEffect(() => {
+    const loadUser = async () => {
+      try{
+        const storedUser = await AsyncStorage.getItem('michef_user');
+        if(storedUser){
+          const parsedUser = JSON.parse(storedUser);
+          setUserData(parsedUser);
+        }
+      } catch(err){
+        console.log("Error cargando usuario:", err);
+      }
+    }
+    loadUser();
+  }, []);
+
+ 
+  const usuario_id = userData?.id;
   const handleSearch = async () => {
+
     setHasSearched(true);
     const term = searchTerm.trim();
 
@@ -70,6 +92,7 @@ const RecipeManagerScreen = ({ navigation }) => {
 
   const handleToggleFavorite = async (recipeId) => {
     try {
+      
       const response = await fetch(FAVORITE_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
