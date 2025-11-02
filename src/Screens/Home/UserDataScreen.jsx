@@ -99,9 +99,12 @@ const UserDataScreen = ({ navigation }) => {
 
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#FACC15" />
-        <Text>Cargando datos del usuario...</Text>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f5f5f5' }}>
+        <ActivityIndicator size="large" color="#007bff" />
+        <Text style={{ marginTop: 20, fontSize: 16, color: '#333' }}>Cargando datos del usuario...</Text>
+        <Text style={{ marginTop: 10, fontSize: 12, color: '#666', textAlign: 'center', paddingHorizontal: 40 }}>
+          Por favor espere...
+        </Text>
       </View>
     );
   }

@@ -1,4 +1,4 @@
-import { Platform } from 'react-native';
+import { Platform, NativeModules } from 'react-native';
 import Constants from 'expo-constants';
 
 // Obtener la URL del servidor backend
@@ -8,20 +8,35 @@ const getServerURL = () => {
         return 'http://localhost';
     }
     
-    // En móvil, intenta obtener el host desde Expo
-    // Esto funciona cuando usas: npx expo start --tunnel
-    const expoHost = Constants.expoConfig?.hostUri;
-    
+    // En móvil, intenta obtener el host del dev server (funciona con Tunnel y LAN)
+    const expoHost = Constants.expoConfig?.hostUri
+        || Constants.expoGoConfig?.hostUri
+        || Constants.expoGoConfig?.debuggerHost; // ej: 192.168.1.5:8081
+
     if (expoHost) {
-        // Extraer solo el host (sin el puerto de Expo)
-        const host = expoHost.split(':')[0];
-        console.log('Usando host de Expo:', host);
-        return `http://${host}`;
+        const hostOnly = String(expoHost).split('/')[0].split(':')[0];
+        if (hostOnly) {
+            console.log('Usando host de Expo:', hostOnly);
+            return `http://${hostOnly}`;
+        }
+    }
+
+    // Fallback adicional: usar scriptURL de RN (LAN)
+    const scriptURL = NativeModules?.SourceCode?.scriptURL; // ej: http://192.168.1.5:8081/index.bundle?...
+    if (scriptURL) {
+        try {
+            const hostPart = String(scriptURL).split('://')[1].split('/')[0]; // 192.168.1.5:8081
+            const hostOnly = hostPart.split(':')[0];
+            if (hostOnly) {
+                console.log('Usando host de SourceCode.scriptURL:', hostOnly);
+                return `http://${hostOnly}`;
+            }
+        } catch {}
     }
     
     // Fallback: usar IP local (solo funciona en la misma WiFi)
-    console.log('No se detectó Expo Tunnel, usando IP local');
-    return 'http://10.31.193.169';
+    console.log('No se detectó host automáticamente, usando localhost');
+    return 'http://localhost';
 };
 
 const URL = getServerURL();

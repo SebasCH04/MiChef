@@ -183,7 +183,7 @@ const LoginScreen = ( { navigation } ) => {
             {/* Enlace de Registro */}
             <View style={styles.registerContainer}>
                 <Text style={styles.registerText}>
-                    En caso de no tener una cuenta, presione en{' '}
+                    Si no tiene una cuenta, presione en{' '}
                 </Text>
                 <TouchableOpacity
                     accessibilityLabel="Registrarse"

@@ -121,12 +121,6 @@ const RegisterScreen = ({ navigation }) => {
             }
             
         } catch (error) {
-            console.error('=== ERROR al cargar catálogos ===');
-            console.error('Error completo:', error);
-            console.error('Error message:', error.message);
-            console.error('Error code:', error.code);
-            console.error('Error response:', error.response?.data);
-            
             // Determinar el tipo de error y crear un mensaje apropiado
             let errorTitle = 'Error al Cargar Datos';
             let errorMessage = '';
