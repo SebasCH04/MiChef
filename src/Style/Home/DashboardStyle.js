@@ -1,9 +1,14 @@
 import { StyleSheet, Platform } from 'react-native';
 
 export const styles = StyleSheet.create({
+  // Safe area general: blanco
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff', // Fondo blanco para toda la pantalla
+    backgroundColor: '#fff',
+  },
+  // Franja superior: naranja
+  safeTop: {
+    backgroundColor: '#FF8C00',
   },
   container: {
     flex: 1,
@@ -16,10 +21,11 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 15,
         paddingVertical: 10,
+        height: 65,
         backgroundColor: '#FF8C00', // Naranja Fuerte
   },
   headerTitle: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: 'bold',
     color: 'white',
   },
@@ -35,17 +41,14 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  profileIconContainer: {
-    // Si necesitas algún estilo adicional para el contenedor del icono de perfil
-  },
 
   // Sección de Recomendaciones
   sectionTitle: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#0d47a1',
     marginHorizontal: 15,
-    marginTop: 20,
+    marginTop: 25,
     marginBottom: 15,
   },
 
@@ -94,6 +97,7 @@ export const styles = StyleSheet.create({
   recommendationsList: {
     flex: 1,
     paddingHorizontal: 15,
+    marginBottom: 125, // Espacio al final para evitar solapamiento con botones
   },
   recommendationsListContent: {
     paddingBottom: 20, // Espacio al final de la lista
@@ -140,7 +144,7 @@ export const styles = StyleSheet.create({
   // Botones Flotantes Inferiores
   bottomButtonsContainer: {
     position: 'absolute',
-    bottom: 20, // Ajusta según el espacio deseado desde el borde inferior
+    bottom: 5, // Ajusta según el espacio deseado desde el borde inferior
     left: 0,
     right: 0,
     flexDirection: 'row',

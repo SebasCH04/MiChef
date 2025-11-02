@@ -76,19 +76,34 @@ const UserDataScreen = ({ navigation }) => {
     );
   };
 
-  const renderAvoidIngredients = (ingredientsString) => {
-    const ingredients = ingredientsString ? ingredientsString.split(',').map(i => i.trim()) : [];
-    const accessibilityLabel = `Ingredientes a evitar: ${ingredients.join(', ')}`;
-    
+  const renderAvoidIngredients = (ingredientsInput) => {
+    let ingredients = [];
+    if (Array.isArray(ingredientsInput)) {
+      ingredients = ingredientsInput.map(i => (typeof i === 'string' ? i.trim() : String(i))).filter(Boolean);
+    } else if (typeof ingredientsInput === 'string') {
+      ingredients = ingredientsInput.split(',').map(i => i.trim()).filter(Boolean);
+    }
+
+    const hasNone = ingredients.length === 0;
+    const accessibilityLabel = hasNone
+      ? 'Ingredientes a evitar: Ninguno'
+      : `Ingredientes a evitar: ${ingredients.join(', ')}`;
+
     return (
       <View accessible accessibilityLabel={accessibilityLabel}>
         <Text style={styles.dataLabel} accessibilityElementsHidden>Ingredientes a evitar:</Text>
         <View style={styles.avoidIngredientsList}>
-          {ingredients.map((item, index) => (
-            <Text key={index} style={styles.dataValue} accessibilityElementsHidden>
-              {item}
+          {hasNone ? (
+            <Text style={styles.dataValue} accessibilityElementsHidden>
+              Ninguno
             </Text>
-          ))}
+          ) : (
+            ingredients.map((item, index) => (
+              <Text key={index} style={styles.dataValue} accessibilityElementsHidden>
+                {item}
+              </Text>
+            ))
+          )}
         </View>
       </View>
     );
@@ -96,6 +111,39 @@ const UserDataScreen = ({ navigation }) => {
 
   const handleChangePasswordPress = () => navigation.navigate('recoverPassword');
   const handleEditProfilePress = () => navigation.navigate('registroPage', { isEditing: true });
+
+  const renderAllergies = (allergiesInput) => {
+    let items = [];
+    if (Array.isArray(allergiesInput)) {
+      items = allergiesInput.map(a => (typeof a === 'string' ? a.trim() : String(a))).filter(Boolean);
+    } else if (typeof allergiesInput === 'string') {
+      items = allergiesInput.split(',').map(a => a.trim()).filter(Boolean);
+    }
+
+    const hasNone = items.length === 0;
+    const accessibilityLabel = hasNone
+      ? 'Tipo de alergias: Ninguno'
+      : `Tipo de alergias: ${items.join(', ')}`;
+
+    return (
+      <View accessible accessibilityLabel={accessibilityLabel}>
+        <Text style={styles.dataLabel} accessibilityElementsHidden>Tipo de alergias:</Text>
+        <View style={styles.allergiesList || styles.avoidIngredientsList}>
+          {hasNone ? (
+            <Text style={styles.dataValue} accessibilityElementsHidden>
+              Ninguno
+            </Text>
+          ) : (
+            items.map((item, index) => (
+              <Text key={index} style={styles.dataValue} accessibilityElementsHidden>
+                {item}
+              </Text>
+            ))
+          )}
+        </View>
+      </View>
+    );
+  };
 
   if (loading) {
     return (
@@ -118,7 +166,9 @@ const UserDataScreen = ({ navigation }) => {
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <>
+    <SafeAreaView edges={['top']} style={styles.safeTop} />
+    <SafeAreaView edges={['left','right','bottom']} style={styles.safeArea}>
       <View 
         style={styles.header}
         accessible
@@ -143,7 +193,7 @@ const UserDataScreen = ({ navigation }) => {
           {renderDataRow("Correo electrónico:", userData?.email)}
           {renderDataRow("Nivel de conocimiento:", userData?.knowledgeLevel)}
           {renderDataRow("Tipo de dieta:", userData?.dietType)}
-          {renderDataRow("Tipo de alergias:", userData?.allergies)}
+          {renderAllergies(userData?.allergies)}
           {renderAvoidIngredients(userData?.ingredientsToAvoid)}
 
           <TouchableOpacity 
@@ -180,6 +230,7 @@ const UserDataScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
     </SafeAreaView>
+    </>
   );
 };
 

@@ -5,8 +5,8 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  SafeAreaView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { styles } from '../../Style/Login/ChangePasswordStyle.js';
 import axios from 'axios';
@@ -79,11 +79,14 @@ const ChangePasswordScreen = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Encabezado Naranja */}
-      <View style={styles.header}>
-        <Text style={styles.headerText}>MiChef</Text>
-      </View>
+    <>
+    <SafeAreaView edges={['top']} style={styles.safeTop} />
+    <SafeAreaView edges={['left','right','bottom']} style={styles.safeArea}>
+      <View style={styles.container}>
+        {/* Encabezado Naranja */}
+        <View style={styles.header}>
+          <Text style={styles.headerText}>MiChef</Text>
+        </View>
 
       <View style={styles.content}>
         {/* Enlace/Título de la pantalla */}
@@ -166,8 +169,10 @@ const ChangePasswordScreen = ({ navigation }) => {
               <Text style={styles.buttonText}>Cancelar</Text>
             </TouchableOpacity>
           </View>
+        </View>
       </View>
     </SafeAreaView>
+    </>
   );
 };
 

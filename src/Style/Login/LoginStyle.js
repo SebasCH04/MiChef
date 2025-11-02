@@ -4,29 +4,44 @@ import { StyleSheet } from 'react-native';
 
 
 export const styles = StyleSheet.create({
+  // Resto de la pantalla
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#f5f5f5', // Blanco/gris claro
+  },
+  // Solo la franja superior
+  safeTop: {
+    backgroundColor: '#FF8C00',
+  },
   container: {
     flexGrow: 1,
+    backgroundColor: '#f5f5f5',
+    paddingBottom: 40,
+  },
+  // Contenedor para vista estática (sin scroll)
+  containerStatic: {
+    flex: 1,
     backgroundColor: '#f5f5f5',
     paddingBottom: 40,
   },
 
   // Estilos del encabezado
   header: {
-    backgroundColor: '#F77F00',
-    paddingVertical: 16,
-
-    paddingHorizontal: 20,
+    backgroundColor: '#FF8C00',
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    height: 65,
     marginBottom: 20,
   },
   headerText: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
 
   // Título "Inicio de Sesión"
   title: {
-    marginTop: 150,
+    marginTop: 75,
     fontSize: 22,
     fontWeight: '600',
     color: '#0d47a1',

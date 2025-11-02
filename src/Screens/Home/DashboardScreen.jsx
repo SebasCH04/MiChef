@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   View, 
   Text, 
@@ -15,6 +15,7 @@ import { styles } from '../../Style/Home/DashboardStyle.js';
 import GestorImage from '../../../assets/GestorImage.png';
 import IAImage from '../../../assets/IAImage.png';
 import URL from '../../Services/url.js';
+import { useFocusEffect } from '@react-navigation/native';
 
 const API_URL = `${URL}:3000/home`;
 
@@ -75,9 +76,27 @@ const DashboardScreen = ({ navigation }) => {
     }
   };
 
+  // Volver a cargar cuando cambia el filtro
   useEffect(() => {
     fetchRecommendations();
   }, [activeFilter]);
+
+  // Cargar cuando el usuario esté listo (primer render tras login)
+  useEffect(() => {
+    if (usuario_id) {
+      fetchRecommendations();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [usuario_id]);
+
+  // Recargar al volver al enfoque del Dashboard (navegación de regreso)
+  useFocusEffect(
+    useCallback(() => {
+      if (usuario_id) {
+        fetchRecommendations();
+      }
+    }, [usuario_id, activeFilter])
+  );
 
   const handleToggleFavorite = async (recipeId) => {
     try {
@@ -135,11 +154,15 @@ const DashboardScreen = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView
-      style={styles.safeArea}
-      accessible={true}
-      accessibilityLabel="Pantalla principal de MiChef con recomendaciones personalizadas"
-    >
+    <>
+      {/* Franja superior en naranja (solo notch) */}
+      <SafeAreaView edges={['top']} style={styles.safeTop} />
+      <SafeAreaView
+        edges={['left','right','bottom']}
+        style={styles.safeArea}
+        accessible={true}
+        accessibilityLabel="Pantalla principal de MiChef con recomendaciones personalizadas"
+      >
       <View style={styles.container}>
         
         {/* HEADER */}
@@ -177,7 +200,7 @@ const DashboardScreen = ({ navigation }) => {
               <MaterialCommunityIcons name="logout" size={28} color="white" />
             </TouchableOpacity>
           </View>
-        </View>
+  </View>
 
         {/* TÍTULO */}
         <Text
@@ -340,7 +363,8 @@ const DashboardScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </>
   );
 };
 

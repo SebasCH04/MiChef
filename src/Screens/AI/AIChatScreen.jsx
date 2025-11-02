@@ -86,12 +86,14 @@ const AIChatScreen = ({ navigation }) => {
 
 
     return (
-        <SafeAreaView style={styles.safeArea}>
-            
+        <>
+        <SafeAreaView edges={['top']} style={isFullScreen ? styles.safeTopHidden : styles.safeTop} />
+        <SafeAreaView edges={['left','right','bottom']} style={styles.safeArea}>
+            {/* Encabezado MiChef (ocultar en pantalla completa) */}
             {!isFullScreen && (
-                <View style={styles.header}>
-                    <Text style={styles.headerTitle}>MiChef</Text>
-                </View>
+              <View style={styles.header}>
+                  <Text style={styles.headerTitle}>MiChef</Text>
+              </View>
             )}
 
             <KeyboardAvoidingView
@@ -203,6 +205,7 @@ const AIChatScreen = ({ navigation }) => {
                 </TouchableOpacity>
             )}
         </SafeAreaView>
+        </>
     );
 };
 

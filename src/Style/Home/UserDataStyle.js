@@ -2,9 +2,14 @@ import { StyleSheet, Platform } from 'react-native';
 
 
 export const styles = StyleSheet.create({
+    // Resto de la pantalla en blanco
     safeArea: {
         flex: 1,
         backgroundColor: '#fff',
+    },
+    // Solo la franja superior en naranja
+    safeTop: {
+        backgroundColor: '#FF8C00',
     },
     // Header (Replicado del Dashboard)
     header: {
@@ -13,11 +18,11 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#FF8C00',
         paddingHorizontal: 15,
-        paddingVertical: Platform.OS === 'ios' ? 10 : 15,
+        paddingVertical: 10,
         height: 65,
     },
     headerTitle: {
-        fontSize: 24,
+        fontSize: 26,
         fontWeight: 'bold',
         color: 'white',
     },
@@ -30,7 +35,7 @@ export const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 22,
         fontWeight: 'bold',
-        color: '#333',
+        color: '#0d47a1',
         marginTop: 20,
         marginBottom: 15,
     },
@@ -58,13 +63,17 @@ export const styles = StyleSheet.create({
     dataValue: {
         fontSize: 16,
         color: '#333',
-        marginLeft: 10, // Indentación para los valores
+        marginTop: 4,
         marginBottom: 5,
     },
     
-    // Lista de ingredientes a evitar (sin guiones/puntos, solo valores)
+    // Lista de ingredientes a evitar
     avoidIngredientsList: {
-        marginLeft: 0, // Ajuste si se necesita más espacio
+        marginLeft: 0, 
+    },
+    // Lista de alergias
+    allergiesList: {
+        marginBottom: 5
     },
 
     // Enlace de Contraseña
@@ -83,7 +92,7 @@ export const styles = StyleSheet.create({
 
     // Botones Flotantes Inferiores
     bottomButtonsContainer: {
-        marginBottom: 200,
+        marginBottom: 10,
         flexDirection: 'row',
         justifyContent: 'space-around',
         paddingHorizontal: 15,

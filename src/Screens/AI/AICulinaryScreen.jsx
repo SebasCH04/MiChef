@@ -31,7 +31,9 @@ const AICulinaryScreen = ({ navigation }) => {
     };
 
     return (
-        <SafeAreaView style={styles.safeArea}>
+        <>
+        <SafeAreaView edges={['top']} style={styles.safeTop} />
+        <SafeAreaView edges={['left','right','bottom']} style={styles.safeArea}>
             <View style={styles.header}>
                 <Text style={styles.headerTitle}>MiChef</Text>
                 <TouchableOpacity 
@@ -100,6 +102,7 @@ const AICulinaryScreen = ({ navigation }) => {
                 <Text style={styles.backButtonText}>Volver al Inicio</Text>
             </TouchableOpacity>
         </SafeAreaView>
+        </>
     );
 };
 

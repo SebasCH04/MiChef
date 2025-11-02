@@ -3,19 +3,29 @@ import { StyleSheet, Dimensions } from 'react-native';
 const { height } = Dimensions.get('window');
 
 export const styles = StyleSheet.create({
-    safeArea: {
-        flex: 1,
-        backgroundColor: '#fff',
-    },
+    // Resto de la pantalla
+    safeArea: {
+        flex: 1,
+        backgroundColor: '#fff',
+    },
+    // Solo la franja superior
+    safeTop: {
+        backgroundColor: '#FF8C00',
+    },
+    // Franja superior cuando está en pantalla completa (blanca)
+    safeTopHidden: {
+        backgroundColor: '#fff',
+    },
     // --- Header ---
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        paddingHorizontal: 15,
-        paddingVertical: 15,
-        backgroundColor: '#FF8C00', // Naranja Fuerte
-    },
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        paddingHorizontal: 15,
+        paddingVertical: 10,
+        height: 65,
+        backgroundColor: '#FF8C00', // Naranja del header
+    },
     headerTitle: {
         fontSize: 26,
         fontWeight: 'bold',
@@ -34,7 +44,7 @@ export const styles = StyleSheet.create({
     mainTitle: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#1a4785', // Azul oscuro
+        color: '#0d47a1', // Azul oscuro
         marginTop: 20,
         marginBottom: 8,
         textAlign: 'center',

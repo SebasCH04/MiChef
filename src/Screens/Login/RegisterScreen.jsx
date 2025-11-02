@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  View, 
-  Text, 
-  TextInput, 
-  TouchableOpacity, 
-  ScrollView, 
-  KeyboardAvoidingView, 
-  Platform,
-  Alert,
-  ActivityIndicator,
+    View, 
+    Text, 
+    TextInput, 
+    TouchableOpacity, 
+    ScrollView, 
+    KeyboardAvoidingView, 
+    Platform,
+    Alert,
+    ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRoute } from '@react-navigation/native';
 import { Picker } from '@react-native-picker/picker';
@@ -67,7 +68,14 @@ const RegisterScreen = ({ navigation }) => {
                 const resp = await axios.get(`${URL}:3000/home/userData`, { params: { usuario_id }, timeout: 20000, validateStatus: s => s>=200 && s<600 });
                 if (resp.status === 200 && resp.data?.success) {
                     const ud = resp.data.data || {};
-                    setAllergies(ud.allergies || '');
+                    // Prefill visible solo si hay datos válidos; si viene "sin padecimiento" u otro equivalente, dejar vacío
+                    const rawAllergies = (ud.allergies ?? '').toString().trim();
+                    const noneSynonyms = ['sin padecimiento','ninguno','ninguna','n/a','na','no aplica','ninguna alergia'];
+                    if (!rawAllergies || noneSynonyms.includes(rawAllergies.toLowerCase())) {
+                        setAllergies('');
+                    } else {
+                        setAllergies(rawAllergies);
+                    }
                     setIngredientsToAvoid(ud.ingredientsToAvoid || '');
                     // Map names to ids in catalogs
                     if (ud.knowledgeLevel) {
@@ -496,16 +504,21 @@ const RegisterScreen = ({ navigation }) => {
     }
 
     const screenTitle = isEditing ? 'Editar Perfil' : 'Registrarse';
-    const actionButtonText = isEditing ? 'Guardar Cambios' : 'Registrarse';
+    const actionButtonText = isEditing ? 'Guardar' : 'Registrarse';
 
     return (
-        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-            <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
-                <View style={styles.header}>
-                    <Text style={styles.headerText}>MiChef</Text>
-                </View>
-                <Text style={styles.title}>{screenTitle}</Text>
-                <View style={styles.formContainer}>
+        // Barra superior (solo notch) en naranja + resto blanco
+        <>
+            <SafeAreaView edges={['top']} style={styles.safeTop} />
+            <SafeAreaView edges={['left','right','bottom']} style={styles.safeArea}>
+                <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+                    <View style={styles.screenContainer}>
+                        <View style={styles.header}>
+                            <Text style={styles.headerText}>MiChef</Text>
+                        </View>
+                        <Text style={styles.title}>{screenTitle}</Text>
+                        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 20 }} keyboardShouldPersistTaps="handled">
+                            <View style={styles.formContainer}>
                     {submitError ? (
                         <View style={{ backgroundColor: '#ffebee', borderColor: '#ff5252', borderWidth: 1, padding: 10, borderRadius: 6, marginBottom: 10 }}>
                             <Text style={{ color: '#b00020' }}>{submitError}</Text>
@@ -570,17 +583,20 @@ const RegisterScreen = ({ navigation }) => {
                     <TextInput style={styles.input} value={allergies} onChangeText={setAllergies} placeholder="Ej: Gluten, Lactosa, etc..." />
                     <Text style={styles.label}>Ingredientes a evitar (separado por comas)</Text>
                     <TextInput style={styles.input} value={ingredientsToAvoid} onChangeText={setIngredientsToAvoid} placeholder="Ej: Cilantro, Ajo, etc..." />
-                </View>
-                <View style={styles.buttonContainer}>
+                            </View>
+                        </ScrollView>
+                        <View style={styles.buttonContainer}>
                     <TouchableOpacity style={[styles.registerButton, submitting && { opacity: 0.6 }]} onPress={handleAction} disabled={submitting}>
                         {submitting ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>{actionButtonText}</Text>}
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.cancelButton} onPress={handleCancel} disabled={submitting}>
                         <Text style={styles.buttonText}>Cancelar</Text>
                     </TouchableOpacity>
-                </View>
-            </ScrollView>
-        </KeyboardAvoidingView>
+                        </View>
+                    </View>
+                </KeyboardAvoidingView>
+            </SafeAreaView>
+        </>
     );
 };
 

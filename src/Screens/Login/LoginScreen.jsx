@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { styles } from '../../Style/Login/LoginStyle.js';
 import URL from '../../Services/url.js';
 import axios from 'axios';
@@ -101,10 +102,14 @@ const LoginScreen = ( { navigation } ) => {
     };
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.headerText} accessibilityRole="header">MiChef</Text>
-            </View>
+        <>
+            <SafeAreaView edges={['top']} style={styles.safeTop} />
+            <SafeAreaView edges={['left','right','bottom']} style={styles.safeArea}>
+            <KeyboardAvoidingView style={{flex:1}} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+            <View style={styles.containerStatic}>
+                <View style={styles.header}>
+                    <Text style={styles.headerText} accessibilityRole="header">MiChef</Text>
+                </View>
 
             <Text style={styles.title} accessibilityRole="header">Inicio de Sesión</Text>
 
@@ -194,7 +199,10 @@ const LoginScreen = ( { navigation } ) => {
                     <Text style={styles.registerLink}>Registrarse</Text>
                 </TouchableOpacity>
             </View>
-        </ScrollView>
+            </View>
+            </KeyboardAvoidingView>
+            </SafeAreaView>
+        </>
     );
 };
 

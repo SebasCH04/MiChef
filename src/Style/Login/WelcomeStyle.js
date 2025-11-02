@@ -3,21 +3,24 @@ import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: '#FFFFFF', // Fondo blanco general
+        backgroundColor: '#FFFFFF',
+    },
+    safeTop: {
+        backgroundColor: '#FF8C00',
     },
     container: {
         flex: 1,
         backgroundColor: '#FFFFFF',
     },
     header: {
-        backgroundColor: '#F77F00', // Naranja
-        paddingVertical: 16,
-        paddingHorizontal: 20,
-        alignItems: 'center',
-
+        backgroundColor: '#FF8C00', // Naranja
+        paddingHorizontal: 15,
+        paddingVertical: 10,
+        height: 65,
+        alignItems: 'flex-start',
     },
     headerText: {
-        fontSize: 24,
+        fontSize: 26,
         fontWeight: 'bold',
         color: '#FFFFFF',
     },

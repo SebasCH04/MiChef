@@ -1,28 +1,43 @@
 import { StyleSheet, Platform } from 'react-native';
 
 export const styles = StyleSheet.create({
+  // Safe area general (resto de la pantalla): blanco
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
+  // Solo la franja superior (notch / status bar): naranja
+  safeTop: {
+    backgroundColor: '#FF8C00',
+  },
   container: {
     flexGrow: 1,
     backgroundColor: '#f5f5f5', // Gris claro de fondo
     paddingBottom: 0,
   },
+  // Contenedor de pantalla estática para que solo el formulario se desplace
+  screenContainer: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
 
   // Estilos del encabezado
   header: {
-    backgroundColor: '#F77F00', // Naranja
-    paddingVertical: 15,
-    paddingHorizontal: 20,
+    backgroundColor: '#FF8C00', // Naranja
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    height: 65,
     marginBottom: 0,
   },
   headerText: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: 'bold',
     color: '#ffffff', // Blanco
   },
 
   // Título "Registrarse"
   title: {
-    marginTop: 0,
+    marginTop: 25,
     fontSize: 22,
     fontWeight: '600',
     color: '#0d47a1', // Azul oscuro

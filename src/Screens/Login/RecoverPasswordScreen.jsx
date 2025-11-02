@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { styles } from '../../Style/Login/RecoverPasswordStyle.js';
 import axios from 'axios';
 import URL from '../../Services/url.js';
@@ -76,13 +77,17 @@ const RecoverPasswordScreen = ({ navigation }) => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps='handled'>
-      {/* Encabezado Naranja */}
-      <View style={styles.header}>
-        <Text style={styles.headerText} accessibilityRole="header">
-          MiChef
-        </Text>
-      </View>
+    <>
+    <SafeAreaView edges={['top']} style={styles.safeTop} />
+    <SafeAreaView edges={['left','right','bottom']} style={styles.safeArea}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <View style={styles.containerStatic}>
+        {/* Encabezado Naranja */}
+        <View style={styles.header}>
+          <Text style={styles.headerText} accessibilityRole="header">
+            MiChef
+          </Text>
+        </View>
 
       {/* Título de la sección */}
       <Text 
@@ -156,7 +161,10 @@ const RecoverPasswordScreen = ({ navigation }) => {
           <Text style={styles.buttonText}>Regresar</Text>
         </TouchableOpacity>
       </View>
-    </ScrollView>
+        </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+    </>
   );
 };
 

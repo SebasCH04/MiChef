@@ -23,6 +23,8 @@ const RecipeManagerScreen = ({ navigation }) => {
   const [hasSearched, setHasSearched] = useState(false);
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
   
 
   const API_URL = `${URL}:3000/home/searchRecipes`;
@@ -46,23 +48,15 @@ const RecipeManagerScreen = ({ navigation }) => {
 
  
   const usuario_id = userData?.id;
-  const handleSearch = async () => {
-
-    setHasSearched(true);
-    const term = searchTerm.trim();
-
-    if (!term) {
-      Alert.alert('Aviso', 'Por favor ingresa un término de búsqueda.');
-      return;
-    }
-
+  const fetchRecipes = async (term = '') => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_URL}?usuario_id=${usuario_id}&searchTerm=${encodeURIComponent(term)}`);
+      const qs = term !== undefined && term !== null ? `&searchTerm=${encodeURIComponent(term)}` : '';
+      const response = await fetch(`${API_URL}?usuario_id=${usuario_id}${qs}`);
       const data = await response.json();
 
       if (data.success && Array.isArray(data.data)) {
-        const formatted = data.data.map(item => ({
+        let formatted = data.data.map(item => ({
           id: item.id,
           name: item.name,
           time: item.time,
@@ -71,21 +65,51 @@ const RecipeManagerScreen = ({ navigation }) => {
           image: item.image ? { uri: item.image } : null,
           isFavorite: item.isFavorite === true || item.isFavorite === 'true',
         }));
+        // Intento de orden más nuevo a más viejo por id si aplica
+        formatted.sort((a, b) => (b.id ?? 0) - (a.id ?? 0));
         setFilteredRecipes(formatted);
-        AccessibilityInfo.announceForAccessibility(`Se encontraron ${formatted.length} recetas.`);
+        setCurrentPage(1);
+        AccessibilityInfo.announceForAccessibility(`Se cargaron ${formatted.length} recetas.`);
       } else {
         setFilteredRecipes([]);
-        Alert.alert('Sin resultados', data.message || 'No se encontraron recetas.');
-        AccessibilityInfo.announceForAccessibility('No se encontraron resultados.');
+        setCurrentPage(1);
       }
     } catch (error) {
-      console.error('Error al buscar recetas:', error);
+      console.error('Error al obtener recetas:', error);
       Alert.alert('Error', 'No se pudo conectar con el servidor.');
-      AccessibilityInfo.announceForAccessibility('Error al buscar recetas.');
     } finally {
       setLoading(false);
     }
   };
+
+  const handleSearch = async () => {
+    setHasSearched(true);
+    const term = searchTerm.trim();
+    if (!term) {
+      // Si no hay término, cargar todas
+      await fetchRecipes('');
+      return;
+    }
+    await fetchRecipes(term);
+  };
+
+  // Cargar todas las recetas al iniciar (cuando tenemos usuario)
+  useEffect(() => {
+    if (usuario_id) {
+      fetchRecipes('');
+    }
+  }, [usuario_id]);
+
+  // Paginación derivada
+  const totalItems = filteredRecipes.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  const safePage = Math.min(Math.max(currentPage, 1), totalPages);
+  const startIdx = (safePage - 1) * pageSize;
+  const endIdx = startIdx + pageSize;
+  const visibleRecipes = filteredRecipes.slice(startIdx, endIdx);
+
+  const goPrev = () => setCurrentPage(p => Math.max(1, p - 1));
+  const goNext = () => setCurrentPage(p => Math.min(totalPages, p + 1));
 
   const handleGoBack = () => navigation.goBack();
   const handleProfilePress = () => navigation.navigate('userdata');
@@ -181,7 +205,9 @@ const RecipeManagerScreen = ({ navigation }) => {
   );
 
   return (
-    <SafeAreaView style={styles.safeArea} accessible={false}>
+    <>
+    <SafeAreaView edges={['top']} style={styles.safeTop} />
+    <SafeAreaView edges={['left','right','bottom']} style={styles.safeArea} accessible={false}>
       {/* Header */}
       <View style={styles.header} accessible={true} accessibilityRole="header">
         <Text style={styles.headerTitle} accessibilityLabel="MiChef, Gestor de Recetas">MiChef</Text>
@@ -257,33 +283,51 @@ const RecipeManagerScreen = ({ navigation }) => {
               style={{ marginTop: 20 }}
               accessibilityLabel="Cargando recetas"
             />
-          ) : filteredRecipes.length > 0 && hasSearched ? (
+          ) : filteredRecipes.length > 0 ? (
             <ScrollView
               contentContainerStyle={styles.scrollContent}
               accessible={true}
               accessibilityLabel="Resultados de búsqueda de recetas"
             >
-              {filteredRecipes.map((item) => (
+              {visibleRecipes.map((item) => (
                 <RecipeCard key={item.id} item={item} />
               ))}
               <View style={{ height: 20 }} /> 
+              {/* Controles de paginación */}
+              <View style={styles.paginationContainer} accessible accessibilityRole="adjustable" accessibilityLabel={`Página ${safePage} de ${totalPages}`}>
+                <TouchableOpacity
+                  style={[styles.paginationButton, safePage === 1 && styles.paginationButtonDisabled]}
+                  onPress={goPrev}
+                  disabled={safePage === 1}
+                  accessibilityRole="button"
+                  accessibilityLabel="Página anterior"
+                >
+                  <Text style={styles.paginationButtonText}>Anterior</Text>
+                </TouchableOpacity>
+                <Text style={styles.paginationInfo} accessibilityElementsHidden>
+                  Página {safePage} de {totalPages}
+                </Text>
+                <TouchableOpacity
+                  style={[styles.paginationButton, safePage === totalPages && styles.paginationButtonDisabled]}
+                  onPress={goNext}
+                  disabled={safePage === totalPages}
+                  accessibilityRole="button"
+                  accessibilityLabel="Página siguiente"
+                >
+                  <Text style={styles.paginationButtonText}>Siguiente</Text>
+                </TouchableOpacity>
+              </View>
             </ScrollView>
           ) : hasSearched ? (
-            <View
-              style={styles.noResultsBox}
+            <Text
+              style={styles.noResultsText}
               accessible={true}
               accessibilityLabel="Sin resultados"
             >
-              <Text style={styles.noResultsText}>Sin resultados...</Text>
-            </View>
+              Sin resultados...
+            </Text>
           ) : (
-            <View
-              style={styles.noResultsBox}
-              accessible={true}
-              accessibilityLabel="Busca una receta para comenzar"
-            >
-              <Text style={styles.noResultsText}>Busca una receta para comenzar</Text>
-            </View>
+            <View />
           )}
         </View>
       </View>
@@ -300,6 +344,7 @@ const RecipeManagerScreen = ({ navigation }) => {
         <Text style={styles.backButtonText}>Regresar</Text>
       </TouchableOpacity>
     </SafeAreaView>
+    </>
   );
 };
 

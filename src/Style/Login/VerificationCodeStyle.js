@@ -1,17 +1,27 @@
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
+    // Resto de la pantalla en blanco/gris claro
+    safeArea: {
+        flex: 1,
+        backgroundColor: '#f5f5f5',
+    },
+    // Solo la franja superior (notch)
+    safeTop: {
+        backgroundColor: '#FF8C00',
+    },
     container: {
         flex: 1,
         backgroundColor: '#f5f5f5', // Fondo blanco de la pantalla
     },
     header: {
-        backgroundColor: '#F77F00', // Naranja fuerte
-        padding: 15,
-        paddingTop: 40, // Espacio para la barra de estado
+        backgroundColor: '#FF8C00', // Naranja fuerte
+        paddingHorizontal: 15,
+        paddingVertical: 10,
+        height: 65,
     },
     headerText: {
-        fontSize: 24,
+        fontSize: 26,
         fontWeight: 'bold',
         color: '#fff',
     },

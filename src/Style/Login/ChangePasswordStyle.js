@@ -1,17 +1,27 @@
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
+    // Resto de la pantalla en blanco/gris claro
+    safeArea: {
+        flex: 1,
+        backgroundColor: '#f5f5f5',
+    },
+    // Solo la franja superior (notch)
+    safeTop: {
+        backgroundColor: '#FF8C00',
+    },
     container: {
         flex: 1,
         backgroundColor: '#f5f5f5',
     },
     header: {
-        backgroundColor: '#F77F00', // Naranja
-        padding: 15,
-        paddingTop: 40,
+        backgroundColor: '#FF8C00', // Naranja
+        paddingHorizontal: 15,
+        paddingVertical: 10,
+        height: 65,
     },
     headerText: {
-        fontSize: 24,
+        fontSize: 26,
         fontWeight: 'bold',
         color: '#fff',
     },
@@ -44,7 +54,7 @@ export const styles = StyleSheet.create({
     label: {
         fontSize: 14,
         marginBottom: 5,
-        fontWeight: 'normal', // Manteniendo el estilo de la imagen
+        fontWeight: 'bold',
         // Accesibilidad: El TextInput tiene su propia etiqueta
     },
     input: {

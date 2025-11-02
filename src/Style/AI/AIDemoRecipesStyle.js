@@ -6,6 +6,9 @@ export const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff',
     },
+    safeTop: {
+        backgroundColor: '#FF8C00',
+    },
     // El contenedor principal del contenido (excluyendo el header naranja)
     container: {
         flex: 1,
@@ -23,7 +26,8 @@ export const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         alignItems: 'center',
         paddingHorizontal: 15,
-        paddingVertical: 15,
+        paddingVertical: 10,
+        height: 65,
         backgroundColor: '#FF8C00', // Naranja Fuerte
     },
     headerTitle: {

@@ -12,7 +12,10 @@ const WelcomeScreen = ({ navigation }) => {
 
     return (
         <SafeAreaProvider>
+            {/* Franja superior en naranja */}
+            <SafeAreaView edges={['top']} style={styles.safeTop} />
             <SafeAreaView 
+                edges={['left','right','bottom']}
                 style={styles.safeArea}
                 // Permite al lector de pantalla determinar el orden de enfoque.
             >

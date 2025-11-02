@@ -1,28 +1,41 @@
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#ffffff', // Resto blanco
+  },
+  safeTop: {
+    backgroundColor: '#FF8C00',
+  },
   container: {
     flexGrow: 1,
     backgroundColor: '#ffffff', // Fondo blanco, sin el gris claro de las otras pantallas
     paddingBottom: 40,
   },
+  containerStatic: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+    paddingBottom: 20,
+  },
 
   // Estilos del encabezado Naranja
   header: {
-    backgroundColor: '#ff8c00', // Naranja
-    paddingVertical: 15,
-    paddingHorizontal: 20,
+    backgroundColor: '#FF8C00', // Naranja
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    height: 65,
     marginBottom: 0, // Se une directamente con el resto del contenido
   },
   headerText: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: 'bold',
     color: '#ffffff', // Blanco
   },
 
   // Título "Recuperar mi contraseña"
   title: {
-    marginTop: 100, // Espacio para centrar verticalmente, similar a la imagen
+    marginTop: 150,
     fontSize: 26,
     fontWeight: '700',
     color: '#0d47a1', // Azul oscuro
@@ -58,6 +71,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-around',
     marginHorizontal: 20,
     marginTop: 20,
+    marginBottom: 20,
   },
 
   // Botón Confirmar

@@ -87,7 +87,9 @@ const AIDemoRecipesScreen = ({ navigation }) => {
 
     // Usamos ScrollView para permitir el desplazamiento del contenido
     return (
-        <SafeAreaView style={styles.safeArea}>
+        <>
+        <SafeAreaView edges={['top']} style={styles.safeTop} />
+        <SafeAreaView edges={['left','right','bottom']} style={styles.safeArea}>
             {/* Header Naranja (MiChef) */}
             <View style={styles.header}>
                 <Text style={styles.headerTitle}>MiChef</Text>
@@ -197,6 +199,7 @@ const AIDemoRecipesScreen = ({ navigation }) => {
                 <Text style={styles.backButtonText}>Regresar</Text>
             </TouchableOpacity>
         </SafeAreaView>
+        </>
     );
 };
 

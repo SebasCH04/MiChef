@@ -3,9 +3,14 @@ import { StyleSheet, Dimensions } from 'react-native';
 const { height } = Dimensions.get('window');
 
 export const styles = StyleSheet.create({
+    // Resto de la pantalla en blanco
     safeArea: {
         flex: 1,
         backgroundColor: '#fff',
+    },
+    // Franja superior en naranja
+    safeTop: {
+        backgroundColor: '#FF8C00',
     },
     container: {
         flex: 1,
@@ -18,6 +23,7 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 15,
         paddingVertical: 10,
+        height: 65,
         backgroundColor: '#FF8C00', // Naranja Fuerte
     },
     headerTitle: {
@@ -26,14 +32,19 @@ export const styles = StyleSheet.create({
         color: 'white',
     },
     profileIconContainer: {
-        padding: 5,
+        padding: 0,
+        minWidth: 40,
+        minHeight: 40,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 6,
     },
     // --- Títulos ---
     sectionTitle: {
         fontSize: 22,
         fontWeight: 'bold',
-        color: '#1a4785', // Azul oscuro
-        marginTop: 15,
+        color: '#0d47a1', // Azul oscuro
+        marginTop: 25,
         marginBottom: 10,
     },
     listTitle: {
@@ -85,8 +96,8 @@ export const styles = StyleSheet.create({
     recipeListContainer: {
         flex: 1,
         // Usamos una altura calculada para que el botón "Regresar" quede fijo
-        maxHeight: height - 300, 
-        marginBottom: 100,
+        maxHeight: height - 320, 
+        marginBottom: 50,
     },
     scrollContent: {
         paddingBottom: 20,
@@ -105,6 +116,8 @@ export const styles = StyleSheet.create({
     noResultsText: {
         fontSize: 18,
         color: '#666',
+        textAlign: 'center',
+        marginTop: 15,
     },
     // --- Tarjeta de Receta (Reutilizada del Dashboard) ---
     recipeCard: {
@@ -161,5 +174,39 @@ export const styles = StyleSheet.create({
         color: 'white',
         fontWeight: 'bold',
         fontSize: 18,
+    },
+    // --- Paginación ---
+    paginationContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        backgroundColor: '#fff',
+        borderTopWidth: 1,
+        borderColor: '#eee',
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderRadius: 8,
+        marginTop: 6,
+    },
+    paginationButton: {
+        backgroundColor: '#0047AB',
+        borderRadius: 20,
+        paddingVertical: 8,
+        paddingHorizontal: 14,
+        borderWidth: 1,
+        borderColor: 'black',
+    },
+    paginationButtonDisabled: {
+        opacity: 0.5,
+    },
+    paginationButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: 14,
+    },
+    paginationInfo: {
+        fontSize: 14,
+        color: '#333',
+        fontWeight: '600',
     },
 });

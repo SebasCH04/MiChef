@@ -5,6 +5,22 @@ import bcrypt from 'bcrypt';
 import { executeQuery } from '../Services/azureDBConnect.js';
 import { getConnection } from '../Services/azureDBConnect.js';
 
+// Normaliza listas CSV: recorta espacios, elimina vacíos y sinónimos de "ninguno",
+// y de-duplica de forma case-insensitive preservando el primer casing visto.
+const normalizeCsvList = (input) => {
+    if (!input || typeof input !== 'string') return '';
+    const noneSynonyms = new Set(['sin padecimiento','ninguno','ninguna','n/a','na','no aplica','ninguna alergia']);
+    const map = new Map(); // lower -> original
+    input.split(',').forEach(raw => {
+        const token = String(raw || '').trim();
+        if (!token) return;
+        const lower = token.toLowerCase();
+        if (noneSynonyms.has(lower)) return;
+        if (!map.has(lower)) map.set(lower, token);
+    });
+    return Array.from(map.values()).join(', ');
+};
+
 export const getRecomendations = async (req, res) => {
     const { usuario_id } = req.query;
     const { filterType } = req.query;
@@ -48,16 +64,23 @@ export const toggleFavorite = async (req, res) => {
 };
 
 export const searchAllRecipes = async (req, res) => {
-    const { usuario_id, searchTerm } = req.query || '';
-    if (!searchTerm || !usuario_id) {
-        return res.status(400).json({ success: false, message: 'Falta el término de búsqueda' });
+    const { usuario_id } = req.query || {};
+    let { searchTerm } = req.query || {};
+
+    if (!usuario_id) {
+        return res.status(400).json({ success: false, message: 'Falta el ID de usuario' });
     }
+
+    // Permitir listar todas las recetas si no se envía término: usar comodín '%'
+    const term = (typeof searchTerm === 'string' && searchTerm.trim()) ? `%${searchTerm.trim()}%` : '%';
+
     try{
         const pool = await getConnection();
         const request = await pool.request();
         request.input('usuario_id', sql.Int, usuario_id);
-        request.input('searchTerm', sql.NVarChar(100), `%${searchTerm}%`);
+        request.input('searchTerm', sql.NVarChar(100), term);
         const result = await request.execute('sp_SearchAllRecipes');
+        // Si el SP no ordena, el cliente puede ordenar por fecha/id desc; aquí devolvemos tal cual
         res.json({ success: true, data: result.recordset });
     } catch (error) {
         console.error('Error al buscar recetas:', error);
@@ -96,8 +119,10 @@ export const updateUserProfile = async (req, res) => {
         request.input('Nombre', sql.NVarChar(200), nombre);
         request.input('IdNivelCocina', sql.Int, parseInt(idNivelCocina, 10));
         request.input('IdTipoDieta', sql.Int, parseInt(idTipoDieta, 10));
-        request.input('Alergias', sql.NVarChar(sql.MAX), alergias || '');
-        request.input('IngredientesEvitar', sql.NVarChar(sql.MAX), ingredientesEvitar || '');
+    const alergiasClean = normalizeCsvList(alergias || '');
+    const ingredientesClean = normalizeCsvList(ingredientesEvitar || '');
+    request.input('Alergias', sql.NVarChar(sql.MAX), alergiasClean);
+    request.input('IngredientesEvitar', sql.NVarChar(sql.MAX), ingredientesClean);
 
         const result = await request.execute('sp_UpdateUserProfile');
 

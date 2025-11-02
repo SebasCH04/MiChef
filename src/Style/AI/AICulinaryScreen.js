@@ -1,9 +1,14 @@
 import { StyleSheet, Platform } from 'react-native';
 
 export const styles = StyleSheet.create({
+    // Resto de la pantalla en blanco
     safeArea: {
         flex: 1,
         backgroundColor: '#fff',
+    },
+    // Solo franja superior
+    safeTop: {
+        backgroundColor: '#FF8C00',
     },
     scrollContent: {
         flexGrow: 1,
@@ -21,6 +26,7 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 15,
         paddingVertical: 10,
+        height: 65,
         backgroundColor: '#FF8C00', // Naranja Fuerte
     },
     headerTitle: {
@@ -29,23 +35,28 @@ export const styles = StyleSheet.create({
         color: 'white',
     },
     profileIconContainer: {
-        padding: 5,
+        padding: 0,
+        minWidth: 40,
+        minHeight: 40,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 6,
     },
     // --- Títulos y Subtítulos ---
     mainTitle: {
         fontSize: 24,
         fontWeight: 'bold',
         color: '#0047AB', // Azul oscuro
-        marginTop: 15,
+        marginTop: 25,
         alignSelf: 'flex-start', // Alineado a la izquierda como en la imagen
     },
     subtitle: {
         fontSize: 16,
         color: '#333',
-        textAlign: 'center',
+        textAlign: 'justified',
         marginTop: 10,
-        marginBottom: 20,
-        paddingHorizontal: 10,
+        marginBottom: 30,
+        paddingHorizontal: 0,
     },
     // --- Tarjetas de Opción ---
     card: {
