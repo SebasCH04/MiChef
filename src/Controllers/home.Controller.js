@@ -82,4 +82,32 @@ export const getUserData = async (req, res) => {
     }
 };
 
+export const updateUserProfile = async (req, res) => {
+    const { usuario_id, nombre, idNivelCocina, idTipoDieta, alergias, ingredientesEvitar } = req.body || {};
+
+    if (!usuario_id || !nombre || idNivelCocina === undefined || idTipoDieta === undefined) {
+        return res.status(400).json({ success: false, message: 'Faltan campos requeridos' });
+    }
+
+    try {
+        const pool = await getConnection();
+        const request = await pool.request();
+        request.input('usuario_id', sql.Int, parseInt(usuario_id, 10));
+        request.input('Nombre', sql.NVarChar(200), nombre);
+        request.input('IdNivelCocina', sql.Int, parseInt(idNivelCocina, 10));
+        request.input('IdTipoDieta', sql.Int, parseInt(idTipoDieta, 10));
+        request.input('Alergias', sql.NVarChar(sql.MAX), alergias || '');
+        request.input('IngredientesEvitar', sql.NVarChar(sql.MAX), ingredientesEvitar || '');
+
+        const result = await request.execute('sp_UpdateUserProfile');
+
+        // Devolver los datos actualizados si el SP los retorna, si no, solo success
+        const updated = result?.recordset?.[0] || null;
+        return res.json({ success: true, message: 'Perfil actualizado', data: updated });
+    } catch (error) {
+        console.error('Error al actualizar perfil:', error);
+        return res.status(500).json({ success: false, message: 'Error al actualizar perfil', error: error.message });
+    }
+};
+
 

@@ -9,18 +9,30 @@ import {
 } from 'react-native';
 
 import { styles } from '../../Style/Login/VerificationCodeStyle.js';
+import { useRoute } from '@react-navigation/native';
 
 const VerificationCodeScreen = ({ navigation }) => {
+  const route = useRoute();
+  const { email, expectedCode } = route.params || {};
   const [codigo, setCodigo] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
 
   const handleConfirmar = () => {
-    navigation.navigate('changePassword');
+    setErrorMsg('');
+    const input = (codigo || '').trim();
+    if (input.length !== 6) {
+      setErrorMsg('El código debe tener 6 dígitos.');
+      return;
+    }
+    if (expectedCode && input === String(expectedCode)) {
+      navigation.navigate('changePassword', { email, code: expectedCode });
+    } else {
+      setErrorMsg('Código inválido. Verifica e inténtalo nuevamente.');
+    }
   };
 
   const handleCancelar = () => {
-    // Lógica para cancelar
-    console.log('Cancelado');
-    alert('Acción Cancelada');
+    navigation.goBack();
   };
 
   return (
@@ -36,6 +48,13 @@ const VerificationCodeScreen = ({ navigation }) => {
           Ingresar código de verificación
         </Text>
 
+        {/* Banner de error */}
+        {errorMsg ? (
+          <View style={{ backgroundColor: '#ffebee', borderColor: '#ff5252', borderWidth: 1, padding: 10, borderRadius: 6, marginBottom: 12 }}>
+            <Text style={{ color: '#b00020' }}>{errorMsg}</Text>
+          </View>
+        ) : null}
+
         {/* Contenedor principal de la tarjeta */}
         <View style={styles.card}>
           <Text style={styles.label}>
@@ -45,7 +64,10 @@ const VerificationCodeScreen = ({ navigation }) => {
           {/* Campo de texto con accesibilidad para código de 6 dígitos */}
           <TextInput
             style={styles.input}
-            onChangeText={setCodigo}
+            onChangeText={(v) => {
+              setCodigo(v);
+              if (errorMsg) setErrorMsg('');
+            }}
             value={codigo}
             placeholder="Ingrese el código de 6 dígitos"
             keyboardType="number-pad" // Solo números

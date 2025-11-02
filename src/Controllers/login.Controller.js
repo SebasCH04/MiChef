@@ -150,10 +150,18 @@ export const loginController = {
             });
 
         } catch (error) {
-            console.error('Error en registro:', error);
+            // Capturar error específico de email duplicado
+            if (error.number === 50001 || error.message?.includes('El email ya está registrado')) {
+                return res.status(409).json({
+                    success: false,
+                    message: 'El email ya está registrado. Por favor usa otro correo electrónico.'
+                });
+            }
+            
+            // Para otros errores, mostrar mensaje genérico sin logs ruidosos
             return res.status(500).json({
                 success: false,
-                message: 'Error en el servidor'
+                message: error.message || 'Error en el servidor al procesar el registro'
             });
         }
     },
@@ -170,7 +178,12 @@ export const loginController = {
                 });
             }
 
-            const token = crypto.randomBytes(32).toString('hex');
+            // El SP espera UNIQUEIDENTIFIER; generar un UUID v4 válido
+            const token = crypto.randomUUID();
+            // Generar un código de 6 dígitos derivado del token (solo números)
+            const hash = crypto.createHash('sha256').update(token).digest('hex');
+            const numeric = parseInt(hash.slice(0, 12), 16) % 1000000;
+            const code = String(numeric).padStart(6, '0');
             const expiracion = new Date();
             expiracion.setHours(expiracion.getHours() + 1);
 
@@ -186,11 +199,12 @@ export const loginController = {
                 });
             }
 
-            await enviarCorreoRecuperacion(email, token);
+            await enviarCorreoRecuperacion(email, code);
 
             return res.json({
                 success: true,
-                message: 'Se ha enviado un correo con las instrucciones para recuperar tu contraseña'
+                message: 'Se ha enviado un correo con las instrucciones para recuperar tu contraseña',
+                code
             });
 
         } catch (error) {
@@ -199,6 +213,73 @@ export const loginController = {
                 success: false,
                 message: 'Error en el servidor'
             });
+        }
+    },
+
+    // Cambio de contraseña con verificación de código
+    resetPassword: async (req, res) => {
+        try {
+            const { email, code, newPassword, confirmPassword } = req.body;
+
+            if (!email || !code || !newPassword || !confirmPassword) {
+                return res.status(400).json({ success: false, message: 'Todos los campos son requeridos' });
+            }
+            if (newPassword !== confirmPassword) {
+                return res.status(400).json({ success: false, message: 'Las contraseñas no coinciden' });
+            }
+            if (newPassword.length < 8) {
+                return res.status(400).json({ success: false, message: 'La contraseña debe tener al menos 8 caracteres' });
+            }
+
+            // Obtener token y expiración almacenados mediante SP (sin SQL incrustado)
+            const rows = await executeQuery(
+                'EXEC sp_GetResetInfo @param0',
+                [email.toLowerCase()]
+            );
+
+            if (!rows || rows.length === 0) {
+                return res.status(404).json({ success: false, message: 'No se encontró una cuenta con ese email' });
+            }
+
+            const { reset_token, reset_expires } = rows[0];
+            if (!reset_token || !reset_expires) {
+                return res.status(400).json({ success: false, message: 'No hay un proceso de recuperación activo' });
+            }
+            const expiresAt = new Date(reset_expires);
+            if (isNaN(expiresAt.getTime()) || expiresAt < new Date()) {
+                return res.status(400).json({ success: false, message: 'El código ha expirado, solicita uno nuevo' });
+            }
+
+            // Regenerar el código a partir del token guardado y compararlo
+            // Normalizar a minúsculas para evitar discrepancias de mayúsculas/minúsculas en GUID desde SQL Server
+            const tokenStr = String(reset_token).trim().toLowerCase();
+            const hash = crypto.createHash('sha256').update(tokenStr).digest('hex');
+            const numeric = parseInt(hash.slice(0, 12), 16) % 1000000;
+            const expectedCode = String(numeric).padStart(6, '0');
+
+            if (String(code).trim() !== expectedCode) {
+                return res.status(401).json({ success: false, message: 'Código inválido' });
+            }
+
+            // Usar SP para evitar SQL incrustado en código
+            await executeQuery(
+                'EXEC sp_ResetPassword @param0, @param1',
+                [email.toLowerCase(), newPassword]
+            );
+
+            // Opcional: correo de confirmación de cambio de contraseña
+            try { await transporter.sendMail({
+                from: 'MiChef <appmichef@gmail.com>',
+                to: email,
+                subject: 'Tu contraseña ha sido cambiada',
+                html: `<div style="font-family: Arial; color:#333;">
+                        <p>Se cambió la contraseña de tu cuenta. Si no fuiste tú, por favor contacta soporte.</p>
+                       </div>`
+            }); } catch (_) {}
+
+            return res.json({ success: true, message: 'Contraseña actualizada correctamente' });
+        } catch (error) {
+            return res.status(500).json({ success: false, message: 'Error al actualizar la contraseña' });
         }
     }
 };
@@ -227,23 +308,21 @@ const enviarCorreoLogin = async (email, nombre) => {
     }
 };
 
-const enviarCorreoRecuperacion = async (email, token) => {
-    const recoveryLink = `https://michef.com/reset-password?token=${token}`;
-    
+const enviarCorreoRecuperacion = async (email, code) => {
     try {
         await transporter.sendMail({
             from: 'MiChef <salascordero2003@gmail.com>',
             to: email,
-            subject: 'Recuperación de Contraseña',
+            subject: 'Código de Recuperación de Contraseña',
             html: `
                 <div style="font-family: Arial, sans-serif; color: #333;">
                     <h1 style="color: #007bff;">Recuperación de Contraseña</h1>
                     <p>Has solicitado restablecer tu contraseña.</p>
-                    <p>Haz clic en el siguiente enlace para crear una nueva contraseña:</p>
-                    <a href="${recoveryLink}" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
-                        Restablecer Contraseña
-                    </a>
-                    <p>Este enlace expirará en 1 hora.</p>
+                    <p>Usa el siguiente código para continuar con el proceso en la app:</p>
+                    <div style="font-size: 24px; font-weight: bold; letter-spacing: 3px; background: #f2f2f2; display: inline-block; padding: 10px 16px; border-radius: 6px; border: 1px solid #ddd;">
+                        ${code}
+                    </div>
+                    <p style="margin-top: 12px;">Este código expirará en 1 hora.</p>
                     <p>Si no solicitaste este cambio, puedes ignorar este correo.</p>
                     <br>
                     <p>— El equipo de MiChef</p>

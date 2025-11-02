@@ -50,7 +50,6 @@ const DashboardScreen = ({ navigation }) => {
       if(!userData) return;
 
       setLoading(true);
-      //console.log(usuario_id);
       const response = await fetch(`${API_URL}/recommendations?usuario_id=${usuario_id}&filterType=${activeFilter}`);
       const data = await response.json();
 
@@ -110,7 +109,6 @@ const DashboardScreen = ({ navigation }) => {
   const getFilteredRecommendations = () => {
     const MY_DIET = userData?.tipo_dieta;
     const MY_LEVEL = userData?.nivel_cocina;
-    //console.log(MY_DIET, MY_LEVEL);
     switch (activeFilter) {
       case 'MiDieta':
         return recommendations.filter(r => r.diet === MY_DIET);

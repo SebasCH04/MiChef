@@ -10,6 +10,7 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRoute } from '@react-navigation/native';
 import { Picker } from '@react-native-picker/picker';
 import { styles } from '../../Style/Login/RegisterStyle.js';
@@ -33,6 +34,7 @@ const RegisterScreen = ({ navigation }) => {
     const [loading, setLoading] = useState(true);
     const [loadingMessage, setLoadingMessage] = useState('Cargando...');
     const [submitting, setSubmitting] = useState(false);
+        const [submitError, setSubmitError] = useState('');
     
     // Estados para los errores de validación
     const [errors, setErrors] = useState({
@@ -46,13 +48,46 @@ const RegisterScreen = ({ navigation }) => {
         loadCatalogs();
     }, []);
 
+    // Prefill when editing: after catalogs are loaded
+    useEffect(() => {
+        if (!isEditing) return;
+        if (nivelesCocina.length === 0 || tiposDieta.length === 0) return;
+        const prefill = async () => {
+            try {
+                const storedUser = await AsyncStorage.getItem('michef_user');
+                if (!storedUser) return;
+                const parsed = JSON.parse(storedUser);
+                // Prefill name/email
+                if (parsed?.nombre) setUsername(parsed.nombre);
+                if (parsed?.email) setEmail(parsed.email);
+
+                // Fetch richer user data for allergies/ingredients and names
+                const usuario_id = parsed.id || parsed.id_usuario;
+                if (!usuario_id) return;
+                const resp = await axios.get(`${URL}:3000/home/userData`, { params: { usuario_id }, timeout: 20000, validateStatus: s => s>=200 && s<600 });
+                if (resp.status === 200 && resp.data?.success) {
+                    const ud = resp.data.data || {};
+                    setAllergies(ud.allergies || '');
+                    setIngredientsToAvoid(ud.ingredientsToAvoid || '');
+                    // Map names to ids in catalogs
+                    if (ud.knowledgeLevel) {
+                        const matchNivel = nivelesCocina.find(n => (n.nombre_nivel||'').toLowerCase() === ud.knowledgeLevel.toLowerCase());
+                        if (matchNivel) setKnowledgeLevel(String(matchNivel.id_nivel));
+                    }
+                    if (ud.dietType) {
+                        const matchDieta = tiposDieta.find(d => (d.nombre_dieta||'').toLowerCase() === ud.dietType.toLowerCase());
+                        if (matchDieta) setDietType(String(matchDieta.id_dieta));
+                    }
+                }
+            } catch (e) {
+                console.log('No se pudo prefijar datos de edición:', e?.message);
+            }
+        };
+        prefill();
+    }, [isEditing, nivelesCocina, tiposDieta]);
+
     const loadCatalogs = async () => {
         try {
-            console.log('=== Iniciando carga de catálogos ===');
-            console.log('URL:', URL);
-            setLoading(true);
-            setLoadingMessage('Cargando...');
-            
             // Configurar axios con timeout más largo
             const axiosConfig = {
                 timeout: 30000, // 30 segundos
@@ -65,10 +100,8 @@ const RegisterScreen = ({ navigation }) => {
             console.log('Llamando a:', nivelesUrl);
             
             const nivelesResponse = await axios.get(nivelesUrl, axiosConfig);
-            console.log('Respuesta niveles:', nivelesResponse.data);
             
             if (nivelesResponse.data.success) {
-                console.log('Niveles obtenidos:', nivelesResponse.data.data);
                 setNivelesCocina(nivelesResponse.data.data);
                 if (nivelesResponse.data.data.length > 0 && !knowledgeLevel) {
                     setKnowledgeLevel(nivelesResponse.data.data[0].id_nivel.toString());
@@ -79,17 +112,14 @@ const RegisterScreen = ({ navigation }) => {
             console.log('Llamando a:', dietasUrl);
             
             const dietasResponse = await axios.get(dietasUrl, axiosConfig);
-            console.log('Respuesta dietas:', dietasResponse.data);
             
             if (dietasResponse.data.success) {
-                console.log('Dietas obtenidas:', dietasResponse.data.data);
                 setTiposDieta(dietasResponse.data.data);
                 if (dietasResponse.data.data.length > 0 && !dietType) {
                     setDietType(dietasResponse.data.data[0].id_dieta.toString());
                 }
             }
             
-            console.log('=== Catálogos cargados exitosamente ===');
         } catch (error) {
             console.error('=== ERROR al cargar catálogos ===');
             console.error('Error completo:', error);
@@ -256,9 +286,11 @@ const RegisterScreen = ({ navigation }) => {
         return true;
     };
 
-        const handleRegister = async () => {
+    const handleRegister = async () => {
         try {
             console.log('=== Iniciando registro ===');
+            setSubmitError('');
+            setSubmitting(true);
             setLoading(true);
             setLoadingMessage('Registrando usuario...');
             
@@ -276,54 +308,76 @@ const RegisterScreen = ({ navigation }) => {
             console.log('URL de registro:', `${URL}:3000/register`);
             console.log('Datos a enviar:', requestData);
             
-            setLoadingMessage('Enviando su registro al servidor...');
+            setLoadingMessage('Registrando nuevo usuario...');
             
             const axiosConfig = {
                 timeout: 30000, // 30 segundos
                 headers: {
                     'Content-Type': 'application/json'
-                }
+                },
+                // Tratar códigos 4xx y 5xx como respuestas manejables (no excepciones)
+                validateStatus: (status) => status >= 200 && status < 600,
             };
             
             const response = await axios.post(`${URL}:3000/register`, requestData, axiosConfig);
             
             console.log('Respuesta del servidor:', response.data);
+            console.log('Status code:', response.status);
+            
+            // Manejar respuestas de error del servidor (4xx, 5xx)
+            if (!response.data.success || response.status >= 400) {
+                const status = response.status;
+                const serverMessage = response.data?.message;
+                let errorTitle = 'Error en el Registro';
+                let errorMessage = '';
+                
+                if (status === 400) {
+                    errorTitle = 'Datos Inválidos';
+                    errorMessage = serverMessage || 'Los datos ingresados no son válidos. Por favor verifica la información.';
+                } else if (status === 409) {
+                    errorTitle = 'Email Ya Registrado';
+                    errorMessage = serverMessage || 'El correo electrónico ya está registrado. Por favor usa otro correo.';
+                } else if (status === 500) {
+                    errorTitle = 'Error del Servidor';
+                    errorMessage = serverMessage || 'Hubo un error en el servidor. Por favor intenta más tarde.';
+                } else {
+                    errorMessage = serverMessage || `Error del servidor (código ${status})`;
+                }
+                // Cerrar overlay de carga ANTES de mostrar el Alert
+                setLoading(false);
+                setSubmitting(false);
+                // Mostrar error inline al estilo del Login
+                setSubmitError(errorMessage);
+                return;
+            }
             
             if (response.data.success) {
-                // Primero detener el loading
+                // Detener estados de carga
                 setLoading(false);
-                
-                // Luego mostrar mensaje de éxito y redirigir al login
-                setTimeout(() => {
-                    Alert.alert(
-                        '¡Registro Exitoso! 🎉',
-                        `Bienvenido ${response.data.user.nombre}!\n\nTu cuenta ha sido creada correctamente.\n\nAhora puedes iniciar sesión con tu correo y contraseña.`,
-                        [
-                            { 
-                                text: 'Ir al Login', 
-                                onPress: () => {
-                                    // Resetear el formulario
-                                    setUsername('');
-                                    setEmail('');
-                                    setPassword('');
-                                    setConfirmPassword('');
-                                    setAllergies('');
-                                    setIngredientsToAvoid('');
-                                    
-                                    // Navegar al Login
-                                    navigation.navigate('Login');
-                                }
-                            }
-                        ],
-                        { cancelable: false } // No permitir cerrar sin presionar el botón
-                    );
-                }, 100);
+                setSubmitting(false);
+
+                // Resetear el formulario
+                setUsername('');
+                setEmail('');
+                setPassword('');
+                setConfirmPassword('');
+                setAllergies('');
+                setIngredientsToAvoid('');
+
+                // Mensaje de éxito que se mostrará en Login
+                const successText = `¡Usuario creado exitosamente! Ahora puedes iniciar sesión.`;
+
+                // Navegar al Login y mostrar banner verde
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: 'login', params: { successMessage: successText } }]
+                });
             }
         } catch (error) {
-            console.error('=== ERROR en registro ===');
-            console.error('Error completo:', error);
-            console.error('Error message:', error.message);
-            console.error('Error response:', error.response?.data);
+            // No mostrar logs en consola para errores esperados (409 - email duplicado)
+            if (error.response?.status !== 409) {
+                console.error('Error en registro:', error.message);
+            }
             
             // Determinar el mensaje de error apropiado
             let errorTitle = 'Error en el Registro';
@@ -366,33 +420,74 @@ const RegisterScreen = ({ navigation }) => {
                 // Error desconocido
                 errorMessage = error.message || 'Ocurrió un error inesperado. Por favor intenta nuevamente.';
             }
-            
-            Alert.alert(errorTitle, errorMessage, [
-                { text: 'Entendido', style: 'default' }
-            ]);
-        } finally {
+            // Cerrar overlay de carga y mostrar error inline
             setLoading(false);
+            setSubmitting(false);
+            setSubmitError(errorMessage);
+        } finally {
+            // Asegurar que no quede bloqueado el botón
+            setSubmitting(false);
+            // El loading ya se maneja antes de los Alerts para que no tape el popup
         }
     };
 
-    const handleAction = () => {
-        console.log('=== handleAction ejecutado ===');
-        console.log('Username:', username);
-        console.log('Email:', email);
-        console.log('Password:', password);
-        console.log('KnowledgeLevel:', knowledgeLevel);
-        console.log('DietType:', dietType);
-        console.log('Allergies:', allergies);
-        console.log('IngredientsToAvoid:', ingredientsToAvoid);
-        
+    const handleAction = async () => {
         // Validar el formulario
-        if (!validateForm()) {
-            // Si hay errores, ya están mostrados en los campos
+        if (!validateForm()) return;
+
+        if (isEditing) {
+            try {
+                setSubmitError('');
+                setSubmitting(true);
+                setLoading(true);
+                setLoadingMessage('Guardando cambios...');
+
+                const storedUser = await AsyncStorage.getItem('michef_user');
+                const parsed = storedUser ? JSON.parse(storedUser) : null;
+                const usuario_id = parsed?.id || parsed?.id_usuario;
+                if (!usuario_id) throw new Error('No se encontró el usuario');
+
+                const payload = {
+                    usuario_id,
+                    nombre: username,
+                    idNivelCocina: parseInt(knowledgeLevel),
+                    idTipoDieta: parseInt(dietType),
+                    alergias: allergies,
+                    ingredientesEvitar: ingredientsToAvoid,
+                };
+
+                const resp = await axios.put(`${URL}:3000/home/updateProfile`, payload, {
+                    timeout: 30000,
+                    headers: { 'Content-Type': 'application/json' },
+                    validateStatus: s => s>=200 && s<600,
+                });
+
+                if (resp.status >= 400 || !resp.data?.success) {
+                    const msg = resp.data?.message || 'No se pudo actualizar el perfil';
+                    setLoading(false); setSubmitting(false); setSubmitError(msg); return;
+                }
+
+                // Actualizar AsyncStorage (al menos el nombre)
+                if (parsed) {
+                    parsed.nombre = username;
+                    await AsyncStorage.setItem('michef_user', JSON.stringify(parsed));
+                }
+
+                setLoading(false); setSubmitting(false);
+                navigation.reset({ index: 0, routes: [{ name: 'userdata' }] });
+            } catch (error) {
+                let msg = 'Error al actualizar el perfil';
+                if (error.code === 'ECONNABORTED' || (error.message||'').includes('timeout')) msg = 'Tiempo agotado al contactar el servidor';
+                else if (error.message?.includes('Network Error') || error.code === 'ERR_NETWORK') msg = 'No se pudo conectar al servidor';
+                setLoading(false); setSubmitting(false); setSubmitError(msg);
+            }
             return;
         }
-        
+
+        // Registro normal
         handleRegister();
-    };    const handleCancel = () => navigation?.goBack();
+    };
+    const handleCancel = () => navigation?.goBack();
 
     if (loading) {
         return (
@@ -417,12 +512,17 @@ const RegisterScreen = ({ navigation }) => {
                 </View>
                 <Text style={styles.title}>{screenTitle}</Text>
                 <View style={styles.formContainer}>
+                    {submitError ? (
+                        <View style={{ backgroundColor: '#ffebee', borderColor: '#ff5252', borderWidth: 1, padding: 10, borderRadius: 6, marginBottom: 10 }}>
+                            <Text style={{ color: '#b00020' }}>{submitError}</Text>
+                        </View>
+                    ) : null}
                     <Text style={styles.label}>Nombre de usuario</Text>
                     <TextInput 
                         style={[styles.input, errors.username && styles.inputError]} 
                         value={username} 
                         onChangeText={handleUsernameChange} 
-                        placeholder="Ej: JuanPerez" 
+                        placeholder="Ej: Juan Ramírez" 
                     />
                     {errors.username ? <Text style={styles.errorText}>{errors.username}</Text> : null}
                     
@@ -435,7 +535,7 @@ const RegisterScreen = ({ navigation }) => {
                                 onChangeText={handleEmailChange} 
                                 keyboardType="email-address" 
                                 autoCapitalize="none" 
-                                placeholder="ejemplo@correo.com" 
+                                placeholder="Ej: juanramirez@correo.com" 
                             />
                             {errors.email ? <Text style={styles.errorText}>{errors.email}</Text> : null}
                             
@@ -473,9 +573,9 @@ const RegisterScreen = ({ navigation }) => {
                         </Picker>
                     </View>
                     <Text style={styles.label}>Tipo de alergias (separado por comas)</Text>
-                    <TextInput style={styles.input} value={allergies} onChangeText={setAllergies} placeholder="Ej: Gluten, Lactosa, Maní" />
+                    <TextInput style={styles.input} value={allergies} onChangeText={setAllergies} placeholder="Ej: Gluten, Lactosa, etc..." />
                     <Text style={styles.label}>Ingredientes a evitar (separado por comas)</Text>
-                    <TextInput style={styles.input} value={ingredientsToAvoid} onChangeText={setIngredientsToAvoid} placeholder="Ej: Cilantro, Trufa" />
+                    <TextInput style={styles.input} value={ingredientsToAvoid} onChangeText={setIngredientsToAvoid} placeholder="Ej: Cilantro, Ajo, etc..." />
                 </View>
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity style={[styles.registerButton, submitting && { opacity: 0.6 }]} onPress={handleAction} disabled={submitting}>

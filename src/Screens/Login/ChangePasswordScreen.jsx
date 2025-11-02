@@ -9,24 +9,73 @@ import {
 } from 'react-native';
 
 import { styles } from '../../Style/Login/ChangePasswordStyle.js';
-const ChangePasswordScreen = () => {
+import axios from 'axios';
+import URL from '../../Services/url.js';
+import { useRoute } from '@react-navigation/native';
+
+const ChangePasswordScreen = ({ navigation }) => {
+  const route = useRoute();
+  const { email, code } = route.params || {};
   const [nuevaContrasena, setNuevaContrasena] = useState('');
   const [confirmarContrasena, setConfirmarContrasena] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
 
-  const handleCambiar = () => {
-    // Lógica para cambiar la contraseña
-    if (nuevaContrasena !== confirmarContrasena) {
-      alert('Las contraseñas no coinciden.');
-      return;
+  const validate = () => {
+    if (!nuevaContrasena || !confirmarContrasena) return 'Completa ambos campos';
+    if (nuevaContrasena.length < 8) return 'La contraseña debe tener al menos 8 caracteres';
+    if (nuevaContrasena !== confirmarContrasena) return 'Las contraseñas no coinciden';
+    return '';
+  };
+
+  const handleCambiar = async () => {
+    setErrorMsg('');
+    setSuccessMsg('');
+    const v = validate();
+    if (v) { setErrorMsg(v); return; }
+
+    setSubmitting(true);
+    try {
+      const resp = await axios.post(
+        `${URL}:3000/reset-password`,
+        {
+          email,
+          code,
+          newPassword: nuevaContrasena,
+          confirmPassword: confirmarContrasena,
+        },
+        {
+          timeout: 30000,
+          headers: { 'Content-Type': 'application/json' },
+          validateStatus: (s) => s >= 200 && s < 600,
+        }
+      );
+
+      if (resp.status === 200 && resp.data?.success) {
+        setSuccessMsg('¡Contraseña actualizada! Inicia sesión con tu nueva contraseña.');
+        setTimeout(() => {
+          navigation.reset({ index: 0, routes: [{ name: 'login', params: { successMessage: 'Contraseña cambiada exitosamente. Ingresa con tu nueva contraseña.' } }] });
+        }, 700);
+        return;
+      }
+
+      if (resp.status === 400) setErrorMsg(resp.data?.message || 'Solicitud inválida');
+      else if (resp.status === 401) setErrorMsg('Código inválido');
+      else if (resp.status === 404) setErrorMsg('No se encontró una cuenta con ese correo');
+      else if (resp.status >= 500) setErrorMsg('Error del servidor. Intenta más tarde.');
+      else setErrorMsg(resp.data?.message || 'No se pudo cambiar la contraseña');
+    } catch (error) {
+      if (error.code === 'ECONNABORTED' || (error.message || '').includes('timeout')) setErrorMsg('Tiempo agotado al contactar el servidor');
+      else if (error.message?.includes('Network Error') || error.code === 'ERR_NETWORK') setErrorMsg('Sin conexión al servidor');
+      else setErrorMsg('Ocurrió un error inesperado');
+    } finally {
+      setSubmitting(false);
     }
-    console.log('Nueva Contraseña:', nuevaContrasena);
-    alert('Contraseña cambiada exitosamente.');
   };
 
   const handleCancelar = () => {
-    // Lógica para cancelar
-    console.log('Cancelado');
-    alert('Operación cancelada.');
+    navigation.goBack();
   };
 
   return (
@@ -42,6 +91,18 @@ const ChangePasswordScreen = () => {
           Cambiar de contraseña
         </Text>
 
+        {/* Banners */}
+        {errorMsg ? (
+          <View style={{ backgroundColor: '#ffebee', borderColor: '#ff5252', borderWidth: 1, padding: 10, borderRadius: 6, marginBottom: 12, marginHorizontal: 20 }}>
+            <Text style={{ color: '#b00020' }}>{errorMsg}</Text>
+          </View>
+        ) : null}
+        {successMsg ? (
+          <View style={{ backgroundColor: '#e8f5e9', borderColor: '#66bb6a', borderWidth: 1, padding: 10, borderRadius: 6, marginBottom: 12, marginHorizontal: 20 }}>
+            <Text style={{ color: '#2e7d32' }}>{successMsg}</Text>
+          </View>
+        ) : null}
+
         {/* Contenedor principal de la tarjeta */}
         <View style={styles.card}>
           {/* Campo Nueva Contraseña */}
@@ -50,7 +111,7 @@ const ChangePasswordScreen = () => {
           </Text>
           <TextInput
             style={styles.input}
-            onChangeText={setNuevaContrasena}
+            onChangeText={(v)=>{ setNuevaContrasena(v); if (errorMsg) setErrorMsg(''); }}
             value={nuevaContrasena}
             secureTextEntry={true} // Ocultar el texto
             placeholder="Ingrese nueva contraseña"
@@ -66,7 +127,7 @@ const ChangePasswordScreen = () => {
           </Text>
           <TextInput
             style={styles.input}
-            onChangeText={setConfirmarContrasena}
+            onChangeText={(v)=>{ setConfirmarContrasena(v); if (errorMsg) setErrorMsg(''); }}
             value={confirmarContrasena}
             secureTextEntry={true} // Ocultar el texto
             placeholder="Confirme su nueva contraseña"
@@ -84,12 +145,13 @@ const ChangePasswordScreen = () => {
             <TouchableOpacity
               style={[styles.button, styles.confirmarButton]}
               onPress={handleCambiar}
+              disabled={submitting}
               // Accesibilidad del botón
               accessibilityRole="button"
               accessibilityLabel="Cambiar mi contraseña"
               accessible={true}
             >
-              <Text style={styles.buttonText}>Cambiar</Text>
+              <Text style={styles.buttonText}>{submitting ? 'Cambiando...' : 'Cambiar'}</Text>
             </TouchableOpacity>
 
             {/* Botón Cancelar */}

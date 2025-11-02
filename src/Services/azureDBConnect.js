@@ -30,7 +30,7 @@ export async function getConnection() {
             poolConnect = pool.connect();
         }
         await poolConnect;
-        console.log('Conexión a BD establecida');
+        console.log('Conexión a BD establecida.');
         return pool;
     } catch (error) {
         console.error('Error al conectar a la base de datos:', error.message);
@@ -59,7 +59,9 @@ export async function executeQuery(query, params = []) {
         const result = await request.query(query);
         return result.recordset;
     } catch (error) {
+        // Solo mostrar mensaje limpio en consola, no el stack completo
         console.error('Error ejecutando query:', error.message);
+        // Re-lanzar el error para que el controlador lo maneje
         throw error;
     }
 }

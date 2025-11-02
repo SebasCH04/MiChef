@@ -168,7 +168,7 @@ const UserDataScreen = ({ navigation }) => {
 
         <TouchableOpacity 
           style={styles.cancelButton} 
-          onPress={() => navigation.goBack()}
+          onPress={() => navigation.navigate('home')}
           accessibilityRole="button"
           accessibilityLabel="Botón Cancelar y volver"
           accessible

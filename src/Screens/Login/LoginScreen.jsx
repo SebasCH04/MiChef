@@ -1,17 +1,30 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { styles } from '../../Style/Login/LoginStyle.js';
 import URL from '../../Services/url.js';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRoute } from '@react-navigation/native';
 
 
 const LoginScreen = ( { navigation } ) => {
+    const route = useRoute();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
         const [submitting, setSubmitting] = useState(false);
         const [errors, setErrors] = useState({ email: '', password: '' });
         const [authError, setAuthError] = useState('');
+        const [successMessage, setSuccessMessage] = useState('');
+
+    // Mostrar mensaje verde si venimos desde registro exitoso
+    useEffect(() => {
+        const msg = route.params?.successMessage;
+        if (msg) {
+            setSuccessMessage(msg);
+            // limpiar params para que no reaparezca
+            navigation.setParams({ successMessage: undefined });
+        }
+    }, [route.params?.successMessage]);
 
     const handleRegisterPress = () => {
         navigation.navigate('registroPage');
@@ -97,6 +110,11 @@ const LoginScreen = ( { navigation } ) => {
 
             {/* Formulario de Login */}
             <View style={styles.formContainer}>
+                                {successMessage ? (
+                                    <View style={{ backgroundColor: '#e8f5e9', borderColor: '#66bb6a', borderWidth: 1, padding: 10, borderRadius: 6, marginBottom: 10 }}>
+                                        <Text style={{ color: '#2e7d32' }}>{successMessage}</Text>
+                                    </View>
+                                ) : null}
                                 {authError ? (
                                     <View style={{ backgroundColor: '#ffebee', borderColor: '#ff5252', borderWidth: 1, padding: 10, borderRadius: 6, marginBottom: 10 }}>
                                         <Text style={{ color: '#b00020' }}>{authError}</Text>
