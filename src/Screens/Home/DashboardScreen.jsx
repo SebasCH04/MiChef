@@ -16,6 +16,7 @@ import GestorImage from '../../../assets/GestorImage.png';
 import IAImage from '../../../assets/IAImage.png';
 import URL from '../../Services/url.js';
 import { useFocusEffect } from '@react-navigation/native';
+import { a11yEs } from '../../Services/a11y';
 
 const API_URL = `${URL}:3000/home`;
 
@@ -160,19 +161,23 @@ const DashboardScreen = ({ navigation }) => {
       <SafeAreaView
         edges={['left','right','bottom']}
         style={styles.safeArea}
-        accessible={true}
-        accessibilityLabel="Pantalla principal de MiChef con recomendaciones personalizadas"
       >
       <View style={styles.container}>
         
         {/* HEADER */}
         <View 
           style={styles.header}
-          accessible={true}
           accessibilityRole="header"
-          accessibilityLabel="Encabezado MiChef"
         >
-          <Text style={styles.headerTitle} accessibilityRole="text">MiChef</Text>
+          <Text
+            style={styles.headerTitle}
+            accessibilityRole="text"
+            accessible={true}
+            accessibilityLabel="Mi Chef"
+            {...a11yEs}
+          >
+            MiChef
+          </Text>
           <View style={styles.headerIcons}>
             {/* Primero el perfil */}
             <TouchableOpacity 
@@ -185,6 +190,7 @@ const DashboardScreen = ({ navigation }) => {
               accessibilityRole="button"
               accessibilityLabel="Abrir perfil de usuario"
               accessibilityHint="Muestra los datos de tu cuenta"
+              {...a11yEs}
             >
               <MaterialCommunityIcons name="account-circle" size={40} color="white" />
             </TouchableOpacity>
@@ -196,6 +202,7 @@ const DashboardScreen = ({ navigation }) => {
               style={styles.logoutButton}
               accessibilityLabel="Cerrar sesión"
               activeOpacity={0.7}
+              {...a11yEs}
             >
               <MaterialCommunityIcons name="logout" size={28} color="white" />
             </TouchableOpacity>
@@ -207,6 +214,7 @@ const DashboardScreen = ({ navigation }) => {
           style={styles.sectionTitle}
           accessible={true}
           accessibilityRole="header"
+          {...a11yEs}
         >
           Recomendaciones para ti
         </Text>
@@ -214,8 +222,6 @@ const DashboardScreen = ({ navigation }) => {
         {/* FILTROS */}
         <View 
           style={styles.filterContainer}
-          accessible={true}
-          accessibilityLabel="Filtros de recetas: Mi dieta, Mi nivel, Favoritos"
         >
           <ScrollView
             horizontal
@@ -231,6 +237,7 @@ const DashboardScreen = ({ navigation }) => {
                 accessibilityRole="button"
                 accessibilityLabel={`Filtrar por ${f === 'MiDieta' ? 'Mi dieta' : f === 'MiNivel' ? 'Mi nivel' : 'Favoritos'}`}
                 accessibilityHint={`Muestra solo las recetas correspondientes a ${f}`}
+                {...a11yEs}
               >
                 <Text 
                   style={[styles.filterButtonText, activeFilter === f && styles.activeFilterButtonText]}
@@ -256,36 +263,38 @@ const DashboardScreen = ({ navigation }) => {
           <ScrollView
             style={styles.recommendationsList}
             contentContainerStyle={styles.recommendationsListContent}
-            accessible={true}
-            accessibilityLabel={`Lista de ${filteredRecommendations.length} recetas`}
           >
             {filteredRecommendations.map((item) => (
-              <TouchableOpacity
+              <View
                 key={item.id}
                 style={styles.recipeCard}
-                accessible={true}
-                accessibilityRole="button"
-                accessibilityLabel={`Receta ${item.name}`}
-                accessibilityHint={`Toca dos veces para abrir, para marcar como favorita hay un botón a continuación`}
+                accessible={false}
               >
                 {item.image ? (
                   <Image
                     source={item.image}
                     style={styles.recipeImage}
-                    accessible={true}
-                    accessibilityLabel={`Imagen de ${item.name}`}
+                    accessible={false}
+                    accessibilityElementsHidden={true}
+                    importantForAccessibility="no"
                   />
                 ) : (
                   <View
                     style={[styles.recipeImage, { backgroundColor: '#eee', justifyContent: 'center', alignItems: 'center' }]}
-                    accessible={true}
-                    accessibilityLabel="Imagen no disponible"
+                    accessible={false}
+                    accessibilityElementsHidden={true}
+                    importantForAccessibility="no"
                   >
-                    <Text>No image</Text>
+                    <Text>Sin Imagen</Text>
                   </View>
                 )}
 
-                <View style={styles.recipeDetails}>
+                <View 
+                  style={styles.recipeDetails}
+                  accessible={true}
+                  accessibilityLabel={`Receta ${item.name}. Tiempo: ${item.time}. Dieta: ${item.diet}. Dificultad: ${item.difficulty}.`}
+                  {...a11yEs}
+                >
                   <Text style={styles.recipeName}>{item.name}</Text>
                   <Text style={styles.recipeInfo}>{item.time}</Text>
                   <Text style={styles.recipeInfo}>{item.diet}</Text>
@@ -302,6 +311,9 @@ const DashboardScreen = ({ navigation }) => {
                     : `Agregar ${item.name} a favoritos`
                   }
                   accessibilityHint="Activa o desactiva el favorito"
+                  accessibilityState={{ selected: item.isFavorite }}
+                  accessibilityValue={{ text: item.isFavorite ? 'Marcado como favorito' : 'No favorito' }}
+                  {...a11yEs}
                 >
                   <MaterialCommunityIcons
                     name={item.isFavorite ? "heart" : "heart-outline"}
@@ -309,7 +321,7 @@ const DashboardScreen = ({ navigation }) => {
                     color={item.isFavorite ? "red" : "#999"}
                   />
                 </TouchableOpacity>
-              </TouchableOpacity>
+              </View>
             ))}
 
             {filteredRecommendations.length === 0 && !loading && (
@@ -327,8 +339,6 @@ const DashboardScreen = ({ navigation }) => {
         {/* BOTONES INFERIORES */}
         <View
           style={styles.bottomButtonsContainer}
-          accessible={true}
-          accessibilityLabel="Opciones adicionales"
         >
           <TouchableOpacity
             style={styles.bottomCard}
@@ -337,6 +347,7 @@ const DashboardScreen = ({ navigation }) => {
             accessibilityRole="button"
             accessibilityLabel="Abrir gestor de recetas"
             accessibilityHint="Te permite buscar y gestionar tus recetas"
+            {...a11yEs}
           >
             <Image
               source={GestorImage}
@@ -353,6 +364,7 @@ const DashboardScreen = ({ navigation }) => {
             accessibilityRole="button"
             accessibilityLabel="Abrir asistente culinario con inteligencia artificial"
             accessibilityHint="Te ayuda a cocinar o sugerir recetas"
+            {...a11yEs}
           >
             <Image
               source={IAImage}

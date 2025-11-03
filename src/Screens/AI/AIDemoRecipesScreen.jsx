@@ -9,6 +9,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { styles } from '../../Style/AI/AIDemoRecipesStyle.js';
+import { a11yEs } from '../../Services/a11y';
 // --- Datos de la Receta ---
 const RECIPE_STEPS = [
     {
@@ -92,28 +93,28 @@ const AIDemoRecipesScreen = ({ navigation }) => {
         <SafeAreaView edges={['left','right','bottom']} style={styles.safeArea}>
             {/* Header Naranja (MiChef) */}
             <View style={styles.header}>
-                <Text style={styles.headerTitle}>MiChef</Text>
+                <Text {...a11yEs} style={styles.headerTitle} accessibilityRole="header" accessibilityLabel="Mi Chef">MiChef</Text>
             </View>
 
             <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                 <View style={styles.container}>
                     
                     {/* Título de Receta y Enlace */}
-                    <TouchableOpacity onPress={() => console.log('Ir a Demo de Receta')}>
+                    <TouchableOpacity onPress={() => console.log('Ir a Demo de Receta')} accessibilityRole="link" accessibilityLabel="Ir a la demo de receta" {...a11yEs}>
                         <Text style={styles.linkText}>Demo de Receta</Text>
                     </TouchableOpacity>
-                    <Text style={styles.mainTitle}>Pasta con Tomate y Albahaca</Text>
+                    <Text {...a11yEs} style={styles.mainTitle}>Pasta con Tomate y Albahaca</Text>
                     
                     {/* Tags de Información */}
                     <View style={styles.tagsContainer}>
                         <View style={styles.tag}>
-                            <Text style={styles.tagText}>30 minutos</Text>
+                            <Text {...a11yEs} style={styles.tagText}>30 minutos</Text>
                         </View>
                         <View style={styles.tag}>
-                            <Text style={styles.tagText}>Dificultad: Fácil</Text>
+                            <Text {...a11yEs} style={styles.tagText}>Dificultad: Fácil</Text>
                         </View>
                         <View style={styles.tag}>
-                            <Text style={styles.tagText}>{`Paso ${currentStep.number} de ${totalSteps}`}</Text>
+                            <Text {...a11yEs} style={styles.tagText}>{`Paso ${currentStep.number} de ${totalSteps}`}</Text>
                         </View>
                     </View>
 
@@ -121,55 +122,67 @@ const AIDemoRecipesScreen = ({ navigation }) => {
                     <View style={styles.stepContainer}>
                         <View style={styles.stepHeader}>
                             <View style={styles.stepNumberBubble}>
-                                <Text style={styles.stepNumber}>{currentStep.number}</Text>
+                                <Text {...a11yEs} style={styles.stepNumber}>{currentStep.number}</Text>
                             </View>
-                            <Text style={styles.stepTitle}>{currentStep.title}</Text>
+                            <Text {...a11yEs} style={styles.stepTitle}>{currentStep.title}</Text>
                         </View>
 
-                        <Text style={styles.stepDescription}>
+                        <Text {...a11yEs} style={styles.stepDescription}>
                             {currentStep.description}
                         </Text>
                         
                         {/* Controles de Navegación */}
                         <View style={styles.navigationButtons}>
                             <TouchableOpacity 
+                                {...a11yEs}
                                 style={[styles.navButton, currentStepIndex === 0 && { opacity: 0.5 }]}
                                 onPress={handlePrevious} 
                                 disabled={currentStepIndex === 0}
+                                accessibilityRole="button"
+                                accessibilityLabel="Paso anterior"
                             >
                                 <Text style={styles.navButtonText}>Anterior</Text>
                             </TouchableOpacity>
                             
                             <TouchableOpacity 
+                                {...a11yEs}
                                 style={[styles.navButton, styles.reproduceButton]}
                                 onPress={handleReproduce}
+                                accessibilityRole="button"
+                                accessibilityLabel="Reproducir el paso actual"
                             >
                                 <Text style={styles.navButtonText}>Reproducir</Text>
                             </TouchableOpacity>
                             
                             <TouchableOpacity 
+                                {...a11yEs}
                                 style={[styles.navButton, currentStepIndex === totalSteps - 1 && { opacity: 0.5 }]}
                                 onPress={handleNext}
                                 disabled={currentStepIndex === totalSteps - 1}
+                                accessibilityRole="button"
+                                accessibilityLabel="Siguiente paso"
                             >
                                 <Text style={styles.navButtonText}>Siguiente</Text>
                             </TouchableOpacity>
                         </View>
 
                         {/* Temporizador */}
-                        <Text style={styles.timerText}>
+                        <Text {...a11yEs} style={styles.timerText}>
                             {currentStep.time}
                         </Text>
                         <TouchableOpacity 
+                            {...a11yEs}
                             style={styles.timerButton}
                             onPress={handleStartTimer}
+                            accessibilityRole="button"
+                            accessibilityLabel={`Iniciar temporizador de ${currentStep.time}`}
                         >
                             <Text style={styles.timerButtonText}>Iniciar Temporizador</Text>
                         </TouchableOpacity>
                     </View>
 
                     {/* Resumen de Pasos */}
-                    <Text style={styles.summaryTitle}>Resumen de pasos</Text>
+                    <Text {...a11yEs} style={styles.summaryTitle}>Resumen de pasos</Text>
                     {RECIPE_STEPS.map((step, index) => (
                         <TouchableOpacity
                             key={step.number}
@@ -178,8 +191,11 @@ const AIDemoRecipesScreen = ({ navigation }) => {
                                 index === currentStepIndex && { borderColor: '#FF8C00', borderWidth: 2 } // Destacar paso actual
                             ]}
                             onPress={() => goToStep(index)}
+                            {...a11yEs}
+                            accessibilityRole="button"
+                            accessibilityLabel={`Ir al paso ${step.number}: ${step.title}`}
                         >
-                            <Text style={styles.summaryButtonText}>
+                            <Text {...a11yEs} style={styles.summaryButtonText}>
                                 {`${step.number}. ${step.title}`}
                             </Text>
                         </TouchableOpacity>
@@ -191,6 +207,7 @@ const AIDemoRecipesScreen = ({ navigation }) => {
 
             {/* Botón Regresar (Fijo, fuera del ScrollView) */}
             <TouchableOpacity
+                {...a11yEs}
                 style={styles.backButton}
                 onPress={handleGoBack}
                 accessibilityRole="button"

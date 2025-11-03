@@ -10,6 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { styles } from '../../Style/Home/UserDataStyle.js';
 import URL from '../../Services/url.js';
+import { a11yEs } from '../../Services/a11y.js';
 
 const UserDataScreen = ({ navigation }) => {
   const [userData, setUserData] = useState(null);
@@ -69,7 +70,7 @@ const UserDataScreen = ({ navigation }) => {
   const renderDataRow = (label, value) => {
     const accessibilityLabel = `${label} ${value}`;
     return (
-      <View style={styles.dataRow} accessible accessibilityLabel={accessibilityLabel}>
+      <View style={styles.dataRow} accessible accessibilityLabel={accessibilityLabel} {...a11yEs}>
         <Text style={styles.dataLabel} accessibilityElementsHidden>{label}</Text>
         <Text style={styles.dataValue} accessibilityElementsHidden>{value}</Text>
       </View>
@@ -90,7 +91,7 @@ const UserDataScreen = ({ navigation }) => {
       : `Ingredientes a evitar: ${ingredients.join(', ')}`;
 
     return (
-      <View accessible accessibilityLabel={accessibilityLabel}>
+      <View accessible accessibilityLabel={accessibilityLabel} {...a11yEs}>
         <Text style={styles.dataLabel} accessibilityElementsHidden>Ingredientes a evitar:</Text>
         <View style={styles.avoidIngredientsList}>
           {hasNone ? (
@@ -126,7 +127,7 @@ const UserDataScreen = ({ navigation }) => {
       : `Tipo de alergias: ${items.join(', ')}`;
 
     return (
-      <View accessible accessibilityLabel={accessibilityLabel}>
+      <View accessible accessibilityLabel={accessibilityLabel} {...a11yEs}>
         <Text style={styles.dataLabel} accessibilityElementsHidden>Tipo de alergias:</Text>
         <View style={styles.allergiesList || styles.avoidIngredientsList}>
           {hasNone ? (
@@ -173,13 +174,15 @@ const UserDataScreen = ({ navigation }) => {
         style={styles.header}
         accessible
         accessibilityRole="header"
-        accessibilityLabel="MiChef aplicación"
+        accessibilityLabel="Mi Chef"
+        {...a11yEs}
       >
         <Text style={styles.headerTitle}>MiChef</Text>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text 
+          {...a11yEs}
           style={styles.sectionTitle}
           accessibilityRole="header"
           accessible
@@ -202,6 +205,7 @@ const UserDataScreen = ({ navigation }) => {
             accessibilityRole="link"
             accessibilityLabel="Cambiar contraseña"
             accessible
+            {...a11yEs}
           >
             <Text style={styles.passwordChangeText}>Cambiar contraseña</Text>
           </TouchableOpacity>
@@ -215,6 +219,7 @@ const UserDataScreen = ({ navigation }) => {
           accessibilityRole="button"
           accessibilityLabel="Botón Actualizar datos"
           accessible
+          {...a11yEs}
         >
           <Text style={styles.actionButtonText}>Actualizar datos</Text>
         </TouchableOpacity>
@@ -225,6 +230,7 @@ const UserDataScreen = ({ navigation }) => {
           accessibilityRole="button"
           accessibilityLabel="Botón Cancelar y volver"
           accessible
+          {...a11yEs}
         >
           <Text style={styles.cancelButtonText}>Regresar</Text>
         </TouchableOpacity>

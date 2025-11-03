@@ -13,7 +13,14 @@ const Card = ({ title, time, diet, difficulty, imageUrl }) => {
       accessibilityLabel={`Receta: ${title}. Tiempo: ${time}. Dieta: ${diet}. Dificultad: ${difficulty}. Toca dos veces para ver la receta.`}
       accessibilityHint={`Abre la receta de ${title}`}
     >
-      <Image source={imageUrl} style={styles.cardImage} resizeMode="cover" />
+      <Image
+        source={imageUrl}
+        style={styles.cardImage}
+        resizeMode="cover"
+        accessible={false}
+        accessibilityElementsHidden={true}
+        importantForAccessibility="no"
+      />
       <View style={styles.cardContent}>
         <View>
           <Text style={styles.cardTitle} accessibilityRole="header">{title}</Text>

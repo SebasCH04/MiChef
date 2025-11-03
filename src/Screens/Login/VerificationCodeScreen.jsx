@@ -10,6 +10,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { styles } from '../../Style/Login/VerificationCodeStyle.js';
 import { useRoute } from '@react-navigation/native';
+import { a11yEs } from '../../Services/a11y.js';
 
 const VerificationCodeScreen = ({ navigation }) => {
   const route = useRoute();
@@ -42,12 +43,12 @@ const VerificationCodeScreen = ({ navigation }) => {
       <View style={styles.container}>
         {/* Encabezado Naranja */}
         <View style={styles.header}>
-          <Text style={styles.headerText}>MiChef</Text>
+          <Text {...a11yEs} style={styles.headerText} accessibilityRole="header" accessibilityLabel="Mi Chef">MiChef</Text>
         </View>
 
       <View style={styles.content}>
         {/* Título */}
-        <Text style={styles.title}>
+        <Text {...a11yEs} style={styles.title} accessibilityRole="header" accessibilityLevel={1}>
           Ingresar código de verificación
         </Text>
 
@@ -60,7 +61,7 @@ const VerificationCodeScreen = ({ navigation }) => {
 
         {/* Contenedor principal de la tarjeta */}
         <View style={styles.card}>
-          <Text style={styles.label}>
+          <Text {...a11yEs} style={styles.label}>
             Código de verificación
           </Text>
 
@@ -76,6 +77,7 @@ const VerificationCodeScreen = ({ navigation }) => {
             keyboardType="number-pad" // Solo números
             maxLength={6} // Máximo 6 dígitos
             // Accesibilidad
+            {...a11yEs}
             accessibilityLabel="Campo de entrada para el código de verificación de 6 dígitos"
             accessibilityHint="Ingresa el código numérico que recibiste"
             accessible={true}
@@ -88,6 +90,7 @@ const VerificationCodeScreen = ({ navigation }) => {
         <View style={styles.buttonContainer}>
             {/* Botón Confirmar */}
             <TouchableOpacity
+              {...a11yEs}
               style={[styles.button, styles.confirmarButton]}
               onPress={handleConfirmar}
               // Accesibilidad del botón
@@ -100,6 +103,7 @@ const VerificationCodeScreen = ({ navigation }) => {
 
             {/* Botón Cancelar */}
             <TouchableOpacity
+              {...a11yEs}
               style={[styles.button, styles.cancelarButton]}
               onPress={handleCancelar}
               // Accesibilidad del botón

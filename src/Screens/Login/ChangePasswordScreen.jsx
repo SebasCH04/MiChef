@@ -12,6 +12,7 @@ import { styles } from '../../Style/Login/ChangePasswordStyle.js';
 import axios from 'axios';
 import URL from '../../Services/url.js';
 import { useRoute } from '@react-navigation/native';
+import { a11yEs } from '../../Services/a11y.js';
 
 const ChangePasswordScreen = ({ navigation }) => {
   const route = useRoute();
@@ -85,12 +86,12 @@ const ChangePasswordScreen = ({ navigation }) => {
       <View style={styles.container}>
         {/* Encabezado Naranja */}
         <View style={styles.header}>
-          <Text style={styles.headerText}>MiChef</Text>
+          <Text {...a11yEs} style={styles.headerText} accessibilityRole="header" accessibilityLabel="Mi Chef">MiChef</Text>
         </View>
 
       <View style={styles.content}>
         {/* Enlace/Título de la pantalla */}
-        <Text style={styles.title}>
+        <Text {...a11yEs} style={styles.title} accessibilityRole="header" accessibilityLevel={1}>
           Cambiar de contraseña
         </Text>
 
@@ -109,7 +110,7 @@ const ChangePasswordScreen = ({ navigation }) => {
         {/* Contenedor principal de la tarjeta */}
         <View style={styles.card}>
           {/* Campo Nueva Contraseña */}
-          <Text style={styles.label}>
+          <Text {...a11yEs} style={styles.label}>
             Nueva contraseña
           </Text>
           <TextInput
@@ -119,13 +120,14 @@ const ChangePasswordScreen = ({ navigation }) => {
             secureTextEntry={true} // Ocultar el texto
             placeholder="Ingrese nueva contraseña"
             // Accesibilidad
+            {...a11yEs}
             accessibilityLabel="Campo de entrada para la nueva contraseña"
             accessibilityHint="Escriba su nueva contraseña. Debe ser secreta."
             accessible={true}
           />
 
           {/* Campo Confirmar Nueva Contraseña */}
-          <Text style={styles.label}>
+          <Text {...a11yEs} style={styles.label}>
             Confirmar nueva contraseña
           </Text>
           <TextInput
@@ -135,6 +137,7 @@ const ChangePasswordScreen = ({ navigation }) => {
             secureTextEntry={true} // Ocultar el texto
             placeholder="Confirme su nueva contraseña"
             // Accesibilidad
+            {...a11yEs}
             accessibilityLabel="Campo de entrada para confirmar la nueva contraseña"
             accessibilityHint="Vuelva a escribir la nueva contraseña para confirmarla."
             accessible={true}
@@ -146,6 +149,7 @@ const ChangePasswordScreen = ({ navigation }) => {
           <View style={styles.buttonContainer}>
             {/* Botón Cambiar */}
             <TouchableOpacity
+              {...a11yEs}
               style={[styles.button, styles.confirmarButton]}
               onPress={handleCambiar}
               disabled={submitting}
@@ -159,6 +163,7 @@ const ChangePasswordScreen = ({ navigation }) => {
 
             {/* Botón Cancelar */}
             <TouchableOpacity
+              {...a11yEs}
               style={[styles.button, styles.cancelarButton]}
               onPress={handleCancelar}
               // Accesibilidad del botón

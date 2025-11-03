@@ -15,6 +15,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from '../../Style/Home/RecipeManagerStyle.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import URL from '../../Services/url.js'; 
+import { a11yEs } from '../../Services/a11y';
 
 
 const RecipeManagerScreen = ({ navigation }) => {
@@ -149,35 +150,39 @@ const RecipeManagerScreen = ({ navigation }) => {
   };
 
   const RecipeCard = ({ item }) => (
-    <TouchableOpacity
+    <View
       style={styles.recipeCard}
-      accessible={true}
-      accessibilityRole="button"
-      accessibilityLabel={`Receta ${item.name}`}
-      accessibilityHint="Toca dos veces para ver más información de esta receta"
-      onPress={() => console.log(`Ver detalles de: ${item.name}`)}
+      accessible={false}
     >
       {item.image ? (
         <Image
           source={item.image}
           style={styles.recipeImage}
-          accessibilityLabel={`Imagen de la receta ${item.name}`}
+          accessible={false}
+          accessibilityElementsHidden={true}
+          importantForAccessibility="no"
         />
       ) : (
         <View
           style={[styles.recipeImage, { backgroundColor: '#eee', justifyContent: 'center', alignItems: 'center' }]}
-          accessible={true}
-          accessibilityLabel="Sin imagen disponible"
+          accessible={false}
+          accessibilityElementsHidden={true}
+          importantForAccessibility="no"
         >
-          <Text>Sin imagen</Text>
+          <Text>Sin Imagen</Text>
         </View>
       )}
 
-      <View style={styles.recipeDetails} accessible={true}>
-        <Text style={styles.recipeName} accessibilityLabel={`Nombre: ${item.name}`}>{item.name}</Text>
-        <Text style={styles.recipeInfo} accessibilityLabel={`Tiempo: ${item.time}`}>{item.time}</Text>
-        <Text style={styles.recipeInfo} accessibilityLabel={`Dieta: ${item.diet}`}>{item.diet}</Text>
-        <Text style={styles.recipeInfo} accessibilityLabel={`Dificultad: ${item.difficulty}`}>{item.difficulty}</Text>
+      <View
+        style={styles.recipeDetails}
+        accessible={true}
+        accessibilityLabel={`Receta ${item.name}. Tiempo: ${item.time}. Dieta: ${item.diet}. Dificultad: ${item.difficulty}.`}
+        {...a11yEs}
+      >
+        <Text style={styles.recipeName}>{item.name}</Text>
+        <Text style={styles.recipeInfo}>{item.time}</Text>
+        <Text style={styles.recipeInfo}>{item.diet}</Text>
+        <Text style={styles.recipeInfo}>{item.difficulty}</Text>
       </View>
 
       {/* Botón de Favorito */}
@@ -190,8 +195,11 @@ const RecipeManagerScreen = ({ navigation }) => {
             ? `Eliminar ${item.name} de favoritos`
             : `Agregar ${item.name} a favoritos`
         }
-        accessibilityHint="Toca dos veces para alternar favorito"
+        accessibilityHint="Activa o desactiva el favorito"
+        accessibilityState={{ selected: item.isFavorite }}
+        accessibilityValue={{ text: item.isFavorite ? 'Marcado como favorito' : 'No favorito' }}
         onPress={() => handleToggleFavorite(item.id)}
+        {...a11yEs}
       >
         <MaterialCommunityIcons
           name={item.isFavorite ? "heart" : "heart-outline"}
@@ -201,16 +209,23 @@ const RecipeManagerScreen = ({ navigation }) => {
           color={item.isFavorite ? "red" : "#999"}
         />
       </TouchableOpacity>
-    </TouchableOpacity>
+    </View>
   );
 
   return (
     <>
     <SafeAreaView edges={['top']} style={styles.safeTop} />
-    <SafeAreaView edges={['left','right','bottom']} style={styles.safeArea} accessible={false}>
+  <SafeAreaView edges={['left','right','bottom']} style={styles.safeArea} accessible={false}>
       {/* Header */}
-      <View style={styles.header} accessible={true} accessibilityRole="header">
-        <Text style={styles.headerTitle} accessibilityLabel="MiChef, Gestor de Recetas">MiChef</Text>
+  <View style={styles.header} accessibilityRole="header">
+        <Text
+          style={styles.headerTitle}
+          accessible={true}
+          accessibilityLabel="Mi Chef, Gestor de Recetas"
+          {...a11yEs}
+        >
+          MiChef
+        </Text>
         <TouchableOpacity
           style={styles.profileIconContainer}
           onPress={handleProfilePress}
@@ -218,6 +233,7 @@ const RecipeManagerScreen = ({ navigation }) => {
           accessibilityRole="button"
           accessibilityLabel="Ir al perfil del usuario"
           accessibilityHint="Toca dos veces para abrir la pantalla de perfil"
+          {...a11yEs}
         >
           <MaterialCommunityIcons name="account-circle" size={40} color="white" />
         </TouchableOpacity>
@@ -228,12 +244,13 @@ const RecipeManagerScreen = ({ navigation }) => {
           style={styles.sectionTitle}
           accessibilityRole="header"
           accessibilityLabel="Gestor de Recetas"
+          {...a11yEs}
         >
           Gestor de Recetas
         </Text>
 
         {/* Barra de búsqueda */}
-        <View style={styles.searchBarContainer} accessible={true}>
+  <View style={styles.searchBarContainer}>
           <View style={styles.searchBox}>
             <MaterialCommunityIcons
               name="magnify"
@@ -253,6 +270,7 @@ const RecipeManagerScreen = ({ navigation }) => {
               accessibilityLabel="Campo de búsqueda de recetas"
               accessibilityHint="Escribe el nombre o dificultad y presiona buscar"
               returnKeyType="search"
+              {...a11yEs}
             />
           </View>
           <TouchableOpacity
@@ -262,6 +280,7 @@ const RecipeManagerScreen = ({ navigation }) => {
             accessibilityRole="button"
             accessibilityLabel="Botón de buscar recetas"
             accessibilityHint="Toca dos veces para buscar recetas con el texto ingresado"
+            {...a11yEs}
           >
             <Text style={styles.searchButtonText}>Buscar</Text>
           </TouchableOpacity>
@@ -271,6 +290,7 @@ const RecipeManagerScreen = ({ navigation }) => {
           style={styles.listTitle}
           accessibilityRole="header"
           accessibilityLabel="Lista de recetas"
+          {...a11yEs}
         >
           Lista de Recetas
         </Text>
@@ -286,21 +306,20 @@ const RecipeManagerScreen = ({ navigation }) => {
           ) : filteredRecipes.length > 0 ? (
             <ScrollView
               contentContainerStyle={styles.scrollContent}
-              accessible={true}
-              accessibilityLabel="Resultados de búsqueda de recetas"
             >
               {visibleRecipes.map((item) => (
                 <RecipeCard key={item.id} item={item} />
               ))}
               <View style={{ height: 20 }} /> 
               {/* Controles de paginación */}
-              <View style={styles.paginationContainer} accessible accessibilityRole="adjustable" accessibilityLabel={`Página ${safePage} de ${totalPages}`}>
+              <View style={styles.paginationContainer}>
                 <TouchableOpacity
                   style={[styles.paginationButton, safePage === 1 && styles.paginationButtonDisabled]}
                   onPress={goPrev}
                   disabled={safePage === 1}
                   accessibilityRole="button"
                   accessibilityLabel="Página anterior"
+                  {...a11yEs}
                 >
                   <Text style={styles.paginationButtonText}>Anterior</Text>
                 </TouchableOpacity>
@@ -313,6 +332,7 @@ const RecipeManagerScreen = ({ navigation }) => {
                   disabled={safePage === totalPages}
                   accessibilityRole="button"
                   accessibilityLabel="Página siguiente"
+                  {...a11yEs}
                 >
                   <Text style={styles.paginationButtonText}>Siguiente</Text>
                 </TouchableOpacity>
@@ -340,6 +360,7 @@ const RecipeManagerScreen = ({ navigation }) => {
         accessibilityRole="button"
         accessibilityLabel="Regresar a la pantalla anterior"
         accessibilityHint="Toca dos veces para volver al menú principal"
+        {...a11yEs}
       >
         <Text style={styles.backButtonText}>Regresar</Text>
       </TouchableOpacity>

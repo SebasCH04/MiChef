@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { styles } from '../../Style/Login/RecoverPasswordStyle.js';
 import axios from 'axios';
 import URL from '../../Services/url.js';
+import { a11yEs } from '../../Services/a11y.js';
 
 
 
@@ -84,16 +85,17 @@ const RecoverPasswordScreen = ({ navigation }) => {
         <View style={styles.containerStatic}>
         {/* Encabezado Naranja */}
         <View style={styles.header}>
-          <Text style={styles.headerText} accessibilityRole="header">
+          <Text {...a11yEs} style={styles.headerText} accessibilityRole="header" accessibilityLabel="Mi Chef">
             MiChef
           </Text>
         </View>
 
       {/* Título de la sección */}
       <Text 
+        {...a11yEs}
         style={styles.title} 
         accessibilityRole="header" 
-        aria-level="1"
+        accessibilityLevel={1}
         // Para que el lector de pantalla lo anuncie claramente
         accessibilityLabel="Recuperar mi contraseña" 
       >
@@ -114,6 +116,7 @@ const RecoverPasswordScreen = ({ navigation }) => {
 
       {/* Campo de Correo Electrónico */}
       <TextInput
+        {...a11yEs}
         style={styles.input}
         keyboardType="email-address"
         autoCapitalize="none"
@@ -130,7 +133,7 @@ const RecoverPasswordScreen = ({ navigation }) => {
       />
 
       {/* Descripción/Instrucciones */}
-      <Text style={styles.descriptionText} accessibilityRole="text">
+      <Text {...a11yEs} style={styles.descriptionText} accessibilityRole="text">
         Escriba el correo electrónico que está asociado a su cuenta, si este existe, le enviaremos un correo con el link para cambiar su contraseña.
       </Text>
 
@@ -138,6 +141,7 @@ const RecoverPasswordScreen = ({ navigation }) => {
       <View style={styles.buttonContainer}>
         {/* Botón Confirmar */}
         <TouchableOpacity
+          {...a11yEs}
           style={styles.confirmButton}
           // Propiedades de accesibilidad
           accessibilityLabel="Confirmar la solicitud de recuperación de contraseña"
@@ -151,6 +155,7 @@ const RecoverPasswordScreen = ({ navigation }) => {
 
         {/* Botón Regresar */}
         <TouchableOpacity
+          {...a11yEs}
           style={styles.backButton}
           // Propiedades de accesibilidad
           accessibilityLabel="Regresar a la pantalla anterior, como iniciar sesión"

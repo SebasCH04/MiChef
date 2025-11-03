@@ -17,6 +17,7 @@ import { Picker } from '@react-native-picker/picker';
 import { styles } from '../../Style/Login/RegisterStyle.js';
 import URL from '../../Services/url.js';
 import axios from 'axios';
+import { a11yEs } from '../../Services/a11y.js';
 
 const RegisterScreen = ({ navigation }) => {
     const route = useRoute();
@@ -514,9 +515,9 @@ const RegisterScreen = ({ navigation }) => {
                 <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
                     <View style={styles.screenContainer}>
                         <View style={styles.header}>
-                            <Text style={styles.headerText}>MiChef</Text>
+                            <Text {...a11yEs} style={styles.headerText} accessibilityRole="header" accessibilityLabel="Mi Chef">MiChef</Text>
                         </View>
-                        <Text style={styles.title}>{screenTitle}</Text>
+                        <Text {...a11yEs} style={styles.title}>{screenTitle}</Text>
                         <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 20 }} keyboardShouldPersistTaps="handled">
                             <View style={styles.formContainer}>
                     {submitError ? (
@@ -524,18 +525,21 @@ const RegisterScreen = ({ navigation }) => {
                             <Text style={{ color: '#b00020' }}>{submitError}</Text>
                         </View>
                     ) : null}
-                    <Text style={styles.label}>Nombre de usuario</Text>
+                    <Text {...a11yEs} style={styles.label}>Nombre de usuario</Text>
                     <TextInput 
                         style={[styles.input, errors.username && styles.inputError]} 
                         value={username} 
                         onChangeText={handleUsernameChange} 
                         placeholder="Ej: Juan Ramírez" 
+                        {...a11yEs}
+                        accessibilityLabel="Nombre de usuario"
+                        accessibilityHint="Escribe tu nombre o alias público"
                     />
                     {errors.username ? <Text style={styles.errorText}>{errors.username}</Text> : null}
                     
                     {!isEditing && (
                         <>
-                            <Text style={styles.label}>Correo electrónico</Text>
+                            <Text {...a11yEs} style={styles.label}>Correo electrónico</Text>
                             <TextInput 
                                 style={[styles.input, errors.email && styles.inputError]} 
                                 value={email} 
@@ -543,53 +547,62 @@ const RegisterScreen = ({ navigation }) => {
                                 keyboardType="email-address" 
                                 autoCapitalize="none" 
                                 placeholder="Ej: juanramirez@correo.com" 
+                                {...a11yEs}
+                                accessibilityLabel="Correo electrónico"
+                                accessibilityHint="Ingresa tu correo electrónico"
                             />
                             {errors.email ? <Text style={styles.errorText}>{errors.email}</Text> : null}
                             
-                            <Text style={styles.label}>Contraseña</Text>
+                            <Text {...a11yEs} style={styles.label}>Contraseña</Text>
                             <TextInput 
                                 style={[styles.input, errors.password && styles.inputError]} 
                                 value={password} 
                                 onChangeText={handlePasswordChange} 
                                 secureTextEntry 
                                 placeholder="Mínimo 8 caracteres" 
+                                {...a11yEs}
+                                accessibilityLabel="Contraseña"
+                                accessibilityHint="Debe tener al menos 8 caracteres"
                             />
                             {errors.password ? <Text style={styles.errorText}>{errors.password}</Text> : null}
                             
-                            <Text style={styles.label}>Confirmar contraseña</Text>
+                            <Text {...a11yEs} style={styles.label}>Confirmar contraseña</Text>
                             <TextInput 
                                 style={[styles.input, errors.confirmPassword && styles.inputError]} 
                                 value={confirmPassword} 
                                 onChangeText={handleConfirmPasswordChange} 
                                 secureTextEntry 
                                 placeholder="Repite la contraseña" 
+                                {...a11yEs}
+                                accessibilityLabel="Confirmar contraseña"
+                                accessibilityHint="Vuelve a escribir la contraseña"
                             />
                             {errors.confirmPassword ? <Text style={styles.errorText}>{errors.confirmPassword}</Text> : null}
                         </>
                     )}
-                    <Text style={styles.label}>Nivel de conocimiento en la cocina</Text>
+                    <Text {...a11yEs} style={styles.label}>Nivel de conocimiento en la cocina</Text>
                     <View style={styles.pickerContainer}>
-                        <Picker selectedValue={knowledgeLevel} onValueChange={setKnowledgeLevel} style={styles.picker}>
+                        <Picker {...a11yEs} selectedValue={knowledgeLevel} onValueChange={setKnowledgeLevel} style={styles.picker}>
                             {nivelesCocina.map(nivel => <Picker.Item key={nivel.id_nivel} label={nivel.nombre_nivel} value={nivel.id_nivel.toString()} />)}
                         </Picker>
                     </View>
-                    <Text style={styles.label}>Tipo de dieta</Text>
+                    <Text {...a11yEs} style={styles.label}>Tipo de dieta</Text>
                     <View style={styles.pickerContainer}>
-                        <Picker selectedValue={dietType} onValueChange={setDietType} style={styles.picker}>
+                        <Picker {...a11yEs} selectedValue={dietType} onValueChange={setDietType} style={styles.picker}>
                             {tiposDieta.map(dieta => <Picker.Item key={dieta.id_dieta} label={dieta.nombre_dieta} value={dieta.id_dieta.toString()} />)}
                         </Picker>
                     </View>
-                    <Text style={styles.label}>Tipo de alergias (separado por comas)</Text>
-                    <TextInput style={styles.input} value={allergies} onChangeText={setAllergies} placeholder="Ej: Gluten, Lactosa, etc..." />
-                    <Text style={styles.label}>Ingredientes a evitar (separado por comas)</Text>
-                    <TextInput style={styles.input} value={ingredientsToAvoid} onChangeText={setIngredientsToAvoid} placeholder="Ej: Cilantro, Ajo, etc..." />
+                    <Text {...a11yEs} style={styles.label}>Tipo de alergias (separado por comas)</Text>
+                    <TextInput {...a11yEs} style={styles.input} value={allergies} onChangeText={setAllergies} placeholder="Ej: Gluten, Lactosa, etc..." accessibilityLabel="Alergias" accessibilityHint="Escribe las alergias separadas por comas" />
+                    <Text {...a11yEs} style={styles.label}>Ingredientes a evitar (separado por comas)</Text>
+                    <TextInput {...a11yEs} style={styles.input} value={ingredientsToAvoid} onChangeText={setIngredientsToAvoid} placeholder="Ej: Cilantro, Ajo, etc..." accessibilityLabel="Ingredientes a evitar" accessibilityHint="Escribe los ingredientes a evitar separados por comas" />
                             </View>
                         </ScrollView>
                         <View style={styles.buttonContainer}>
-                    <TouchableOpacity style={[styles.registerButton, submitting && { opacity: 0.6 }]} onPress={handleAction} disabled={submitting}>
+                    <TouchableOpacity {...a11yEs} accessibilityRole="button" accessibilityLabel={actionButtonText} style={[styles.registerButton, submitting && { opacity: 0.6 }]} onPress={handleAction} disabled={submitting}>
                         {submitting ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>{actionButtonText}</Text>}
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.cancelButton} onPress={handleCancel} disabled={submitting}>
+                    <TouchableOpacity {...a11yEs} accessibilityRole="button" accessibilityLabel="Cancelar" style={styles.cancelButton} onPress={handleCancel} disabled={submitting}>
                         <Text style={styles.buttonText}>Cancelar</Text>
                     </TouchableOpacity>
                         </View>

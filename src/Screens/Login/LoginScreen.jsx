@@ -6,6 +6,7 @@ import URL from '../../Services/url.js';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRoute } from '@react-navigation/native';
+import { a11yEs } from '../../Services/a11y.js';
 
 
 const LoginScreen = ( { navigation } ) => {
@@ -108,10 +109,10 @@ const LoginScreen = ( { navigation } ) => {
             <KeyboardAvoidingView style={{flex:1}} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
             <View style={styles.containerStatic}>
                 <View style={styles.header}>
-                    <Text style={styles.headerText} accessibilityRole="header">MiChef</Text>
+                    <Text {...a11yEs} style={styles.headerText} accessibilityRole="header" accessibilityLabel="Mi Chef">MiChef</Text>
                 </View>
 
-            <Text style={styles.title} accessibilityRole="header">Inicio de Sesión</Text>
+            <Text {...a11yEs} style={styles.title} accessibilityRole="header">Inicio de Sesión</Text>
 
             {/* Formulario de Login */}
             <View style={styles.formContainer}>
@@ -126,7 +127,7 @@ const LoginScreen = ( { navigation } ) => {
                                     </View>
                                 ) : null}
                 {/* Campo de Correo Electrónico */}
-                <Text style={styles.label} accessibilityRole="text">Correo Electrónico</Text>
+                <Text {...a11yEs} style={styles.label} accessibilityRole="text">Correo Electrónico</Text>
                 <TextInput
                     style={[styles.input, errors.email ? styles.inputError : null]}
                     keyboardType="email-address"
@@ -138,13 +139,14 @@ const LoginScreen = ( { navigation } ) => {
                       setErrors((prev) => ({ ...prev, email: validateEmail(v) }));
                                             if (authError) setAuthError('');
                     }}
+                    {...a11yEs}
                     accessibilityLabel="Introduce tu correo electrónico"
                     accessibilityHint="Campo de texto para el correo electrónico"
                 />
                 {errors.email ? <Text style={styles.errorText}>{errors.email}</Text> : null}
 
                 {/* Campo de Contraseña */}
-                <Text style={styles.label} accessibilityRole="text">Contraseña</Text>
+                <Text {...a11yEs} style={styles.label} accessibilityRole="text">Contraseña</Text>
                 <TextInput
                     style={[styles.input, errors.password ? styles.inputError : null]}
                     secureTextEntry
@@ -155,6 +157,7 @@ const LoginScreen = ( { navigation } ) => {
                       setErrors((prev) => ({ ...prev, password: validatePassword(v) }));
                                             if (authError) setAuthError('');
                     }}
+                    {...a11yEs}
                     accessibilityLabel="Introduce tu contraseña"
                     accessibilityHint="Campo de texto seguro para la contraseña"
                 />
@@ -162,8 +165,9 @@ const LoginScreen = ( { navigation } ) => {
 
                 {/* Enlace para recuperar contraseña */}
                 <View style={styles.forgotPasswordContainer}>
-                    <Text style={styles.forgotPasswordText}>¿No recuerda su contraseña? Presione </Text>
+                    <Text {...a11yEs} style={styles.forgotPasswordText}>¿No recuerda su contraseña? Presione </Text>
                     <TouchableOpacity
+                        {...a11yEs}
                         accessibilityLabel="Recuperar contraseña"
                         accessibilityHint="Pulsa para ir a la página de recuperación de contraseña"
                         accessibilityRole="link"
@@ -176,6 +180,7 @@ const LoginScreen = ( { navigation } ) => {
             {/* Botón de Iniciar Sesión */}
             <TouchableOpacity
                 style={[styles.button, submitting && { opacity: 0.7 }]}
+                {...a11yEs}
                 accessibilityLabel="Iniciar Sesión"
                 accessibilityHint="Pulsa para acceder a tu cuenta"
                 accessibilityRole="button"
@@ -187,10 +192,11 @@ const LoginScreen = ( { navigation } ) => {
 
             {/* Enlace de Registro */}
             <View style={styles.registerContainer}>
-                <Text style={styles.registerText}>
+                <Text {...a11yEs} style={styles.registerText}>
                     Si no tiene una cuenta, presione en{' '}
                 </Text>
                 <TouchableOpacity
+                    {...a11yEs}
                     accessibilityLabel="Registrarse"
                     accessibilityHint="Pulsa para crear una nueva cuenta"
                     accessibilityRole="link"

@@ -53,9 +53,9 @@ export const styles = StyleSheet.create({
     subtitle: {
         fontSize: 16,
         color: '#333',
-        textAlign: 'justified',
-        marginTop: 10,
-        marginBottom: 30,
+        textAlign: 'center',
+        marginTop: 15,
+        marginBottom: 25,
         paddingHorizontal: 0,
     },
     // --- Tarjetas de Opción ---
