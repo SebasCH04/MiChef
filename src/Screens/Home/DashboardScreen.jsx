@@ -254,7 +254,7 @@ const DashboardScreen = ({ navigation }) => {
         {loading ? (
           <ActivityIndicator
             size="large"
-            color="#000"
+            color="#FF8C00"
             style={{ marginTop: 40 }}
             accessible={true}
             accessibilityLabel="Cargando recetas"

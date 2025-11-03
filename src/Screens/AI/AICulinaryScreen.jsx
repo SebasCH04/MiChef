@@ -23,9 +23,7 @@ const AICulinaryScreen = ({ navigation }) => {
         navigation.navigate('AIChatScreen');
     };
 
-    const handleViewDemo = () => {
-        navigation.navigate('AIDemoRecipes')
-    };
+    // Demo de receta deshabilitado temporalmente
 
     const handleGoBack = () => {
         navigation.goBack();
@@ -72,11 +70,11 @@ const AICulinaryScreen = ({ navigation }) => {
                         Elige una opción para comenzar tu experiencia culinaria utilizando inteligencia artificial.
                     </Text>
 
-                    {/* --- Tarjeta 1: Consultar IA Culinaria --- */}
+                    {/* --- Tarjeta: Consultar IA Culinaria --- */}
                     <View style={styles.card}>
                         <MaterialCommunityIcons
                             name="robot"
-                            size={50}
+                            size={60}
                             color="#1a4785"
                             accessible={false}
                             accessibilityElementsHidden={true}
@@ -84,37 +82,14 @@ const AICulinaryScreen = ({ navigation }) => {
                         />
                         <Text {...a11yEs} style={styles.cardTitle}>Consultar IA Culinaria</Text>
                         <Text {...a11yEs} style={styles.cardDescription}>
-                            Pregunta sobre recetas, ingredientes y técnicas de cocina. Obtén sugerencias personalizadas con texto a voz incluido.
+                            Haz preguntas sobre recetas, ingredientes y técnicas de cocina; recibe trucos, sustituciones de ingredientes y recomendaciones adaptadas a tu nivel, tiempo disponible y preferencias. La respuesta se presenta en texto claro y, si lo deseas, también con lectura en voz alta para que puedas cocinar sin mirar la pantalla.
                         </Text>
                         <TouchableOpacity 
                             style={[styles.cardButton, styles.primaryButton]}
                             onPress={handleStartChat}
                             {...a11yEs}
                         >
-                            <Text style={styles.cardButtonText}>Comenzar Chat IA</Text>
-                        </TouchableOpacity>
-                    </View>
-
-                    {/* --- Tarjeta 2: Seguir Receta Paso a Paso --- */}
-                    <View style={styles.card}>
-                        <MaterialCommunityIcons
-                            name="book-open-variant"
-                            size={50}
-                            color="#1a4785"
-                            accessible={false}
-                            accessibilityElementsHidden={true}
-                            importantForAccessibility="no"
-                        />
-                        <Text {...a11yEs} style={styles.cardTitle}>Seguir Receta Paso a Paso</Text>
-                        <Text {...a11yEs} style={styles.cardDescription}>
-                            Cocina con instrucciones detalladas utilizando inteligencia artificial, texto a voz y temporizador integrado para cada paso.
-                        </Text>
-                        <TouchableOpacity 
-                            style={[styles.cardButton, styles.secondaryButton]}
-                            onPress={handleViewDemo}
-                            {...a11yEs}
-                        >
-                            <Text style={styles.cardButtonText}>Ver Demo de Receta</Text>
+                            <Text style={styles.cardButtonText}>Comenzar Chef AI</Text>
                         </TouchableOpacity>
                     </View>
                     

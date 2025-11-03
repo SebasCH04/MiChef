@@ -91,24 +91,79 @@ export const styles = StyleSheet.create({
 
   // Contenedor del Picker (para darle un borde y fondo)
   pickerContainer: {
-    backgroundColor: '#ffffff', // Blanco
-    borderWidth: 1,
-    borderColor: '#cccccc', // Gris de borde
-    borderRadius: 5,
-    overflow: 'hidden', // Asegura que el contenido se ajuste al borde
-    marginBottom: 15,
+    display: 'none', // oculto: ya no usamos el picker nativo
   },
 
-  // Estilos específicos para el componente Picker
-  picker: {
-    height: 50, // Altura estándar
-    width: '100%',
-    color: '#000000',
+  // Campo dropdown personalizado
+  dropdownField: {
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#cccccc',
+    borderRadius: 5,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    marginBottom: 15,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
-  // Estilo para los ítems del picker (puede variar entre plataformas)
-  pickerItem: {
+  dropdownText: {
     fontSize: 16,
-    height: Platform.OS === 'ios' ? 150 : undefined, // Altura para iOS
+    color: '#000',
+  },
+  dropdownArrow: {
+    fontSize: 16,
+    color: '#666',
+    marginLeft: 10,
+  },
+
+  // Modal estilos
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    width: '100%',
+    maxWidth: 420,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#eee',
+    padding: 16,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  modalOption: {
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  modalOptionText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  modalCancel: {
+    marginTop: 10,
+    backgroundColor: '#0047AB',
+    borderRadius: 25,
+    borderWidth: 2,
+    borderColor: 'black',
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  modalCancelText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 
   // Contenedor de Botones (para alinear los dos botones horizontalmente)

@@ -86,6 +86,27 @@ npm run web        # Ejecutar en navegador web
 npm run dev        # Iniciar servidor backend
 ```
 
+### Chat de IA con LM Studio (local y gratis)
+
+1. Instala LM Studio (Windows): https://lmstudio.ai/
+2. En LM Studio, descarga el modelo "openai/gpt-oss-20b" (o uno más ligero si tu PC lo requiere).
+3. Activa el "Local Server" (OpenAI Compatible Server). Por defecto expone http://localhost:1234/v1
+4. En `.env` configura:
+   ```env
+   AI_PROVIDER=lmstudio
+   LOCAL_OPENAI_BASE_URL=http://localhost:1234/v1
+   LOCAL_MODEL=openai/gpt-oss-20b
+   # Opcional para pruebas sin IA real:
+   # AI_FAKE=1
+   ```
+5. Inicia el backend con `npm run dev` y la app móvil con `npm start`.
+6. La app llama a `POST /ai/chat`; el backend reenvía a LM Studio y retorna la respuesta en español.
+
+   Notas:
+   - Los modelos grandes (20B) necesitan bastante RAM/VRAM/CPU. Si notas lentitud, prueba con un modelo más pequeño en LM Studio.
+   - Si el servidor local no responde, el backend mostrará un error claro en español pidiéndote iniciar el Local Server.
+
+
 ## Características
 
 ### Módulo Estudiantes

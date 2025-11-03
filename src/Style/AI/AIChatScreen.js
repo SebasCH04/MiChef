@@ -78,7 +78,7 @@ export const styles = StyleSheet.create({
         color: '#333',
     },
     fullScreenButton: {
-        backgroundColor: '#1a4785',
+        backgroundColor: '#0047AB',
         paddingVertical: 5,
         paddingHorizontal: 10,
         borderRadius: 5,
@@ -127,7 +127,7 @@ export const styles = StyleSheet.create({
         marginTop: 5,
     },
     listenButton: {
-        backgroundColor: '#1a4785',
+        backgroundColor: '#0047AB',
         paddingVertical: 8,
         paddingHorizontal: 15,
         borderRadius: 5,
@@ -161,7 +161,7 @@ export const styles = StyleSheet.create({
     voiceButton: {
         backgroundColor: '#fff',
         borderWidth: 1,
-        borderColor: '#1a4785',
+        borderColor: '#0047AB',
         height: 50,
         width: 50,
         borderRadius: 8,
@@ -170,7 +170,7 @@ export const styles = StyleSheet.create({
         marginRight: 10,
     },
     sendButton: {
-        backgroundColor: '#1a4785',
+        backgroundColor: '#0047AB',
         height: 50,
         paddingHorizontal: 15,
         borderRadius: 8,
@@ -190,7 +190,7 @@ export const styles = StyleSheet.create({
         left: 20,
         right: 20,
         height: 50,
-        backgroundColor: '#1a4785', // Azul oscuro
+        backgroundColor: '#0047AB', // Azul oscuro
         borderRadius: 25,
         borderColor: 'black',
         borderWidth: 2,

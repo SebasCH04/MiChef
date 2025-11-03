@@ -303,7 +303,7 @@ const RecipeManagerScreen = ({ navigation }) => {
           {loading ? (
             <ActivityIndicator
               size="large"
-              color="#f57c00"
+              color="#FF8C00"
               style={{ marginTop: 20 }}
               accessibilityLabel="Cargando recetas"
             />

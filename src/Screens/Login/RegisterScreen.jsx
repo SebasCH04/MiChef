@@ -9,11 +9,12 @@ import {
     Platform,
     Alert,
     ActivityIndicator,
+    Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRoute } from '@react-navigation/native';
-import { Picker } from '@react-native-picker/picker';
+// Eliminamos el picker nativo para evitar la rueda en iOS
 import { styles } from '../../Style/Login/RegisterStyle.js';
 import URL from '../../Services/url.js';
 import axios from 'axios';
@@ -33,6 +34,8 @@ const RegisterScreen = ({ navigation }) => {
     const [ingredientsToAvoid, setIngredientsToAvoid] = useState('');
     const [nivelesCocina, setNivelesCocina] = useState([]);
     const [tiposDieta, setTiposDieta] = useState([]);
+    const [nivelModalVisible, setNivelModalVisible] = useState(false);
+    const [dietaModalVisible, setDietaModalVisible] = useState(false);
     const [loading, setLoading] = useState(true);
     const [loadingMessage, setLoadingMessage] = useState('Cargando...');
     const [submitting, setSubmitting] = useState(false);
@@ -495,7 +498,7 @@ const RegisterScreen = ({ navigation }) => {
     if (loading) {
         return (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f5f5f5' }}>
-                <ActivityIndicator size="large" color="#007bff" />
+                <ActivityIndicator size="large" color="#FF8C00" />
                 <Text style={{ marginTop: 20, fontSize: 16, color: '#333' }}>{loadingMessage}</Text>
                 <Text style={{ marginTop: 10, fontSize: 12, color: '#666', textAlign: 'center', paddingHorizontal: 40 }}>
                     Por favor espere...
@@ -506,6 +509,17 @@ const RegisterScreen = ({ navigation }) => {
 
     const screenTitle = isEditing ? 'Editar Perfil' : 'Registrarse';
     const actionButtonText = isEditing ? 'Guardar' : 'Registrarse';
+
+    const nivelLabelByValue = (val) => {
+        const idNum = parseInt(val, 10);
+        const item = nivelesCocina.find(n => Number(n.id_nivel) === idNum);
+        return item ? item.nombre_nivel : '';
+    };
+    const dietaLabelByValue = (val) => {
+        const idNum = parseInt(val, 10);
+        const item = tiposDieta.find(d => Number(d.id_dieta) === idNum);
+        return item ? item.nombre_dieta : '';
+    };
 
     return (
         // Barra superior (solo notch) en naranja + resto blanco
@@ -581,17 +595,106 @@ const RegisterScreen = ({ navigation }) => {
                         </>
                     )}
                     <Text {...a11yEs} style={styles.label}>Nivel de conocimiento en la cocina</Text>
-                    <View style={styles.pickerContainer}>
-                        <Picker {...a11yEs} selectedValue={knowledgeLevel} onValueChange={setKnowledgeLevel} style={styles.picker}>
-                            {nivelesCocina.map(nivel => <Picker.Item key={nivel.id_nivel} label={nivel.nombre_nivel} value={nivel.id_nivel.toString()} />)}
-                        </Picker>
-                    </View>
+                    <TouchableOpacity
+                        {...a11yEs}
+                        style={styles.dropdownField}
+                        accessibilityRole="button"
+                        accessibilityLabel="Seleccionar nivel de cocina"
+                        onPress={() => setNivelModalVisible(true)}
+                    >
+                        <Text style={styles.dropdownText}>
+                            {knowledgeLevel ? nivelLabelByValue(knowledgeLevel) : 'Selecciona un nivel'}
+                        </Text>
+                        <Text style={styles.dropdownArrow}>▾</Text>
+                    </TouchableOpacity>
+
                     <Text {...a11yEs} style={styles.label}>Tipo de dieta</Text>
-                    <View style={styles.pickerContainer}>
-                        <Picker {...a11yEs} selectedValue={dietType} onValueChange={setDietType} style={styles.picker}>
-                            {tiposDieta.map(dieta => <Picker.Item key={dieta.id_dieta} label={dieta.nombre_dieta} value={dieta.id_dieta.toString()} />)}
-                        </Picker>
-                    </View>
+                    <TouchableOpacity
+                        {...a11yEs}
+                        style={styles.dropdownField}
+                        accessibilityRole="button"
+                        accessibilityLabel="Seleccionar tipo de dieta"
+                        onPress={() => setDietaModalVisible(true)}
+                    >
+                        <Text style={styles.dropdownText}>
+                            {dietType ? dietaLabelByValue(dietType) : 'Selecciona un tipo de dieta'}
+                        </Text>
+                        <Text style={styles.dropdownArrow}>▾</Text>
+                    </TouchableOpacity>
+
+                    {/* Modal de Niveles de Cocina */}
+                    <Modal
+                        visible={nivelModalVisible}
+                        transparent
+                        animationType="fade"
+                        onRequestClose={() => setNivelModalVisible(false)}
+                    >
+                        <View style={styles.modalOverlay}>
+                            <View style={styles.modalContent}>
+                                <Text style={styles.modalTitle}>Selecciona tu nivel</Text>
+                                <ScrollView style={{ maxHeight: 300 }}>
+                                    {nivelesCocina.map(nivel => (
+                                        <TouchableOpacity
+                                            key={nivel.id_nivel}
+                                            style={styles.modalOption}
+                                            onPress={() => { setKnowledgeLevel(String(nivel.id_nivel)); setNivelModalVisible(false); }}
+                                            accessibilityRole="button"
+                                            accessibilityLabel={`Seleccionar ${nivel.nombre_nivel}`}
+                                            {...a11yEs}
+                                        >
+                                            <Text style={styles.modalOptionText}>{nivel.nombre_nivel}</Text>
+                                        </TouchableOpacity>
+                                    ))}
+                                </ScrollView>
+                                <TouchableOpacity
+                                    style={styles.modalCancel}
+                                    onPress={() => setNivelModalVisible(false)}
+                                    accessibilityRole="button"
+                                    accessibilityLabel="Cancelar"
+                                    {...a11yEs}
+                                >
+                                    <Text style={styles.modalCancelText}>Cancelar</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </Modal>
+
+                    {/* Modal de Tipos de Dieta */}
+                    <Modal
+                        visible={dietaModalVisible}
+                        transparent
+                        animationType="fade"
+                        onRequestClose={() => setDietaModalVisible(false)}
+                    >
+                        <View style={styles.modalOverlay}>
+                            <View style={styles.modalContent}>
+                                <Text style={styles.modalTitle}>Selecciona tu dieta</Text>
+                                <ScrollView style={{ maxHeight: 300 }}>
+                                    {tiposDieta.map(dieta => (
+                                        <TouchableOpacity
+                                            key={dieta.id_dieta}
+                                            style={styles.modalOption}
+                                            onPress={() => { setDietType(String(dieta.id_dieta)); setDietaModalVisible(false); }}
+                                            accessibilityRole="button"
+                                            accessibilityLabel={`Seleccionar ${dieta.nombre_dieta}`}
+                                            {...a11yEs}
+                                        >
+                                            <Text style={styles.modalOptionText}>{dieta.nombre_dieta}</Text>
+                                        </TouchableOpacity>
+                                    ))}
+                                </ScrollView>
+                                <TouchableOpacity
+                                    style={styles.modalCancel}
+                                    onPress={() => setDietaModalVisible(false)}
+                                    accessibilityRole="button"
+                                    accessibilityLabel="Cancelar"
+                                    {...a11yEs}
+                                >
+                                    <Text style={styles.modalCancelText}>Cancelar</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </Modal>
                     <Text {...a11yEs} style={styles.label}>Tipo de alergias (separado por comas)</Text>
                     <TextInput {...a11yEs} style={styles.input} value={allergies} onChangeText={setAllergies} placeholder="Ej: Gluten, Lactosa, etc..." accessibilityLabel="Alergias" accessibilityHint="Escribe las alergias separadas por comas" />
                     <Text {...a11yEs} style={styles.label}>Ingredientes a evitar (separado por comas)</Text>

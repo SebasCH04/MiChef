@@ -1,9 +1,11 @@
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-
+import 'dotenv/config';
 
 import app from './appExpress.js'
 
-app.listen(3000, '0.0.0.0', () => {
-    console.log('Server running on http://0.0.0.0:3000');
-    console.log('También accesible en http://10.31.193.169:3000');
+const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
+const HOST = process.env.HOST || '0.0.0.0';
+
+app.listen(PORT, HOST, () => {
+    console.log(`Server running on http://${HOST}:${PORT}`);
 });

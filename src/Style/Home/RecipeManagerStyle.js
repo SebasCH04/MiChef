@@ -104,8 +104,8 @@ export const styles = StyleSheet.create({
     },
     noResultsBox: {
         flex: 1,
-        backgroundColor: '#fff0cc', // Amarillo claro/crema (similar a la imagen)
-        minHeight: 300, // Altura mínima similar a la imagen
+        backgroundColor: '#fff0cc', // Amarillo claro/crema
+        minHeight: 300, // Altura mínima
         borderRadius: 8,
         justifyContent: 'center',
         alignItems: 'center',

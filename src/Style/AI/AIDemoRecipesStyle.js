@@ -6,6 +6,20 @@ export const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff',
     },
+    // Estado de carga centrado
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#fff',
+        paddingHorizontal: 20,
+    },
+    loadingText: {
+        textAlign: 'center',
+        marginTop: 12,
+        color: '#333',
+        fontSize: 16,
+    },
     safeTop: {
         backgroundColor: '#FF8C00',
     },
@@ -36,10 +50,20 @@ export const styles = StyleSheet.create({
         color: 'white',
     },
 
+    // Título de sección (coherente con otras pantallas)
+    sectionTitle: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        color: '#0d47a1',
+        marginTop: 15,
+        marginBottom: 10,
+        textAlign: 'left',
+    },
+
     // --- Títulos de la Receta ---
     linkText: {
         fontSize: 26,
-        color: '#1a4785', // Azul de enlace
+        color: '#1a4785', // Estilo antiguo (no usado para el nuevo título)
         textAlign: 'center',
         marginTop: 10,
     },
@@ -56,7 +80,7 @@ export const styles = StyleSheet.create({
     tagsContainer: {
         flexDirection: 'row',
         justifyContent: 'center',
-        marginBottom: 25,
+        marginBottom: 15, // más cerca de la siguiente sección
     },
     tag: {
         backgroundColor: '#fff0cc', // Amarillo claro
@@ -172,11 +196,24 @@ export const styles = StyleSheet.create({
         borderRadius: 8,
         paddingHorizontal: 15,
         paddingVertical: 12,
-        marginBottom: 10,
+        marginBottom: 8,
     },
     summaryButtonText: {
         fontSize: 16,
         color: '#333',
+    },
+
+    // --- Separador de secciones ---
+    sectionDivider: {
+        height: 2,
+        backgroundColor: '#e0e0e0',
+        marginTop: 16,
+        marginBottom: 22, // un poco más de espacio hacia los pasos
+    },
+
+    // Separador sutil por espacio entre secciones (sin línea)
+    sectionSpacerSmall: {
+        height: 12,
     },
 
     // --- Botón Regresar (Fijo) ---

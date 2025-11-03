@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
     View,
     Text,
@@ -13,6 +13,9 @@ import * as Speech from 'expo-speech';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from '../../Style/AI/AIChatScreen.js';
 import { a11yEs } from '../../Services/a11y';
+import { useFocusEffect } from '@react-navigation/native';
+import axios from 'axios';
+import URL from '../../Services/url.js';
 
 const initialMessages = [
     {
@@ -24,14 +27,54 @@ const initialMessages = [
 ];
 
 const AIChatScreen = ({ navigation }) => {
+    // Límites para eficiencia
+    const MAX_PROMPT_WORDS = 80;
+    const MAX_HISTORY = 6;
+
     const [messageInput, setMessageInput] = useState('');
     const [messages, setMessages] = useState(initialMessages);
+    const [isSpeaking, setIsSpeaking] = useState(false);
+    const [speakingMsgId, setSpeakingMsgId] = useState(null);
     // --- NUEVO: Estado para Pantalla Completa ---
     const [isFullScreen, setIsFullScreen] = useState(false); 
     
     const scrollViewRef = useRef();
 
+    // Utilidad: convertir Markdown a texto plano legible
+    const mdToPlain = (input) => {
+        let t = String(input ?? '');
+        // Quitar fences de código pero mantener contenido
+        t = t.replace(/```[\s\S]*?```/g, (m) => m.replace(/```/g, ''));
+        // Encabezados #
+        t = t.replace(/^\s{0,3}#{1,6}\s+/gm, '');
+        // Negritas y cursivas
+        t = t.replace(/\*\*(.*?)\*\*/g, '$1');
+        t = t.replace(/__(.*?)__/g, '$1');
+        t = t.replace(/(?<!\*)\*(?!\*)([^\*]+)(?<!\*)\*(?!\*)/g, '$1');
+        t = t.replace(/_(.*?)_/g, '$1');
+        // Código inline
+        t = t.replace(/`([^`]+)`/g, '$1');
+        // Imágenes: usar alt
+        t = t.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '$1');
+        // Links: mostrar solo el texto
+        t = t.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1');
+        // Citas
+        t = t.replace(/^>\s?/gm, '');
+        // Reglas horizontales
+        t = t.replace(/^\s*(?:-{3,}|\*{3,}|_{3,})\s*$/gm, '');
+        // Listas sin ordenar
+        t = t.replace(/^\s*[-*+]\s+/gm, '• ');
+        // Listas ordenadas
+        t = t.replace(/^\s*(\d+)\.\s+/gm, '$1) ');
+        // Colapsar saltos múltiples
+        t = t.replace(/\n{3,}/g, '\n\n');
+        return t.trim();
+    };
+
     const handleGoBack = () => {
+        try { Speech.stop(); } catch {}
+        setIsSpeaking(false);
+        setSpeakingMsgId(null);
         navigation.goBack();
     };
 
@@ -39,8 +82,14 @@ const AIChatScreen = ({ navigation }) => {
         console.log('Iniciando grabación de voz...');
     };
 
-    const handleSend = () => {
-        const trimmedInput = messageInput.trim();
+    const limitWords = (text, maxWords) => {
+        const words = text.trim().split(/\s+/);
+        if (words.length <= maxWords) return text.trim();
+        return words.slice(0, maxWords).join(' ') + '…';
+    };
+
+    const handleSend = async () => {
+        const trimmedInput = limitWords(messageInput, MAX_PROMPT_WORDS);
         if (trimmedInput === '') return;
 
         const newUserMessage = {
@@ -50,31 +99,77 @@ const AIChatScreen = ({ navigation }) => {
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         };
 
-        setMessages(prevMessages => [...prevMessages, newUserMessage]);
+        const pendingId = Date.now() + 1;
+        const pendingAI = {
+            id: pendingId,
+            text: 'Pensando…',
+            sender: 'ai',
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        };
+
+        setMessages(prev => [...prev, newUserMessage, pendingAI]);
         setMessageInput('');
 
-        setTimeout(() => {
-            const aiResponse = {
-                id: Date.now() + 1,
-                text: 'Estoy procesando tu solicitud...',
+        try {
+            // Construir historial limitado para la API
+            const recent = [...messages, newUserMessage].slice(-MAX_HISTORY);
+            const history = recent.map(m => ({
+                role: m.sender === 'user' ? 'user' : 'assistant',
+                content: m.text,
+            }));
+
+            const endpoint = `${URL}:3000/ai/chat`;
+            const resp = await axios.post(endpoint, { messages: history }, { timeout: 45000 });
+            const content = resp?.data?.content || 'No recibí contenido de la IA.';
+
+            setMessages(prev => prev.filter(m => m.id !== pendingId).concat({
+                id: Date.now() + 2,
+                text: content,
                 sender: 'ai',
                 timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            };
-            setMessages(prevMessages => [...prevMessages, aiResponse]);
-        }, 1000);
+            }));
+        } catch (e) {
+            const status = e?.response?.status;
+            const serverMsg = e?.response?.data?.message;
+            console.log('Error IA:', status ? `HTTP ${status}` : e?.message);
+            setMessages(prev => prev.filter(m => m.id !== pendingId).concat({
+                id: Date.now() + 3,
+                text: status === 402
+                    ? (serverMsg || 'Saldo insuficiente en la cuenta de IA. Vuelve a intentarlo más tarde.')
+                    : (serverMsg ? `Error: ${serverMsg}` : 'Hubo un error al procesar tu solicitud. Verifica tu conexión e inténtalo de nuevo.'),
+                sender: 'ai',
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            }));
+        }
     };
 
-    const handleListen = (text) => {
+    const handleListen = async (text, id) => {
         try {
-            // Detener cualquier reproducción anterior y hablar en español (México)
-            Speech.stop();
+            const speaking = await Speech.isSpeakingAsync();
+            // Si ya está hablando este mismo mensaje, detener
+            if (speaking && speakingMsgId === id) {
+                Speech.stop();
+                setIsSpeaking(false);
+                setSpeakingMsgId(null);
+                return;
+            }
+            // Si está hablando otra cosa, detener y continuar
+            if (speaking) {
+                Speech.stop();
+            }
             Speech.speak(text, {
                 language: 'es-MX',
                 rate: 1.0,
                 pitch: 1.0,
+                onStart: () => { setIsSpeaking(true); setSpeakingMsgId(id); },
+                onDone: () => { setIsSpeaking(false); setSpeakingMsgId(null); },
+                onStopped: () => { setIsSpeaking(false); setSpeakingMsgId(null); },
+                onError: () => { setIsSpeaking(false); setSpeakingMsgId(null); },
             });
         } catch (e) {
             console.log('Error al reproducir TTS:', e?.message);
+            setIsSpeaking(false);
+            setSpeakingMsgId(null);
         }
     };
 
@@ -89,6 +184,16 @@ const AIChatScreen = ({ navigation }) => {
         });
     }, [navigation]); 
 
+    // Al perder el foco o salir de la pantalla, detener cualquier TTS en curso
+    useFocusEffect(
+        useCallback(() => {
+            return () => {
+                try { Speech.stop(); } catch {}
+                setIsSpeaking(false);
+                setSpeakingMsgId(null);
+            };
+        }, [])
+    );
 
     useEffect(() => {
         if (scrollViewRef.current) {
@@ -139,7 +244,7 @@ const AIChatScreen = ({ navigation }) => {
                     <View style={styles.chatAreaContainer}>
                         {/* Encabezado del chat */}
                         <View style={styles.chatHeader}>
-                            <Text style={styles.chatTitle} {...a11yEs}>Chat IA</Text>
+                            <Text style={styles.chatTitle} {...a11yEs}>Chef AI</Text>
                             <TouchableOpacity
                                 style={styles.fullScreenButton}
                                 onPress={handleFullScreen}
@@ -171,7 +276,7 @@ const AIChatScreen = ({ navigation }) => {
                                             : styles.messageText
                                         }
                                     >
-                                        {message.text}
+                                        {message.sender === 'ai' ? mdToPlain(message.text) : message.text}
                                     </Text>
                                     <Text style={styles.messageTimestamp} {...a11yEs}>
                                         {message.timestamp}
@@ -179,12 +284,14 @@ const AIChatScreen = ({ navigation }) => {
                                     {message.sender === 'ai' && (
                                         <TouchableOpacity
                                             style={styles.listenButton}
-                                            onPress={() => handleListen(message.text)}
+                                            onPress={() => handleListen(message.sender === 'ai' ? mdToPlain(message.text) : message.text, message.id)}
                                             {...a11yEs}
                                             accessibilityRole="button"
-                                            accessibilityLabel="Escuchar este mensaje"
+                                            accessibilityLabel={speakingMsgId === message.id && isSpeaking ? 'Detener este mensaje' : 'Escuchar este mensaje'}
                                         >
-                                            <Text style={styles.listenButtonText}>Escuchar</Text>
+                                            <Text style={styles.listenButtonText}>
+                                                {speakingMsgId === message.id && isSpeaking ? 'Detener' : 'Escuchar'}
+                                            </Text>
                                         </TouchableOpacity>
                                     )}
                                 </View>
