@@ -8,7 +8,6 @@ App en Android/iOS para el proyecto de diseño
 
 - [Instalación](#instalación)
 - [Uso](#uso)
-- [Características](#características)
 - [Arquitectura](#arquitectura)
 - [Tipos de Usuario](#tipos-de-usuario)
 
