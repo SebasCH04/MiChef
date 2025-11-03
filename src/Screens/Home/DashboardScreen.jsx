@@ -265,9 +265,10 @@ const DashboardScreen = ({ navigation }) => {
             contentContainerStyle={styles.recommendationsListContent}
           >
             {filteredRecommendations.map((item) => (
-              <View
+              <TouchableOpacity
                 key={item.id}
                 style={styles.recipeCard}
+                onPress={() => { navigation.navigate('AIDemoRecipes', { receta_id: item.id }); console.log(`Navegando a detalles de receta ID: ${item.id}`); }}
                 accessible={false}
               >
                 {item.image ? (
@@ -321,7 +322,7 @@ const DashboardScreen = ({ navigation }) => {
                     color={item.isFavorite ? "red" : "#999"}
                   />
                 </TouchableOpacity>
-              </View>
+              </TouchableOpacity>
             ))}
 
             {filteredRecommendations.length === 0 && !loading && (

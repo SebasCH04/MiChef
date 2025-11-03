@@ -153,8 +153,9 @@ const RecipeManagerScreen = ({ navigation }) => {
   };
 
   const RecipeCard = ({ item }) => (
-    <View
+    <TouchableOpacity
       style={styles.recipeCard}
+      onPress={() => { navigation.navigate('AIDemoRecipes', { receta_id: item.id }); console.log(`Navegando a detalles de receta ID: ${item.id}`); }}
       accessible={false}
     >
       {item.image ? (
@@ -212,7 +213,7 @@ const RecipeManagerScreen = ({ navigation }) => {
           color={item.isFavorite ? "red" : "#999"}
         />
       </TouchableOpacity>
-    </View>
+    </TouchableOpacity>
   );
 
   return (

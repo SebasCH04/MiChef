@@ -135,4 +135,30 @@ export const updateUserProfile = async (req, res) => {
     }
 };
 
+export const getRecipeDetails = async (req, res) => {
+    const { receta_id } = req.query;
+    if (!receta_id) {
+        return res.status(400).json({ success: false, message: 'Falta el ID de la receta' });
+    }
+    try {
+        const pool = await getConnection();
+        const request = await pool.request();
+
+        request.input('receta_id', sql.Int, receta_id);
+        const result = await request.execute('sp_GetRecipeDetails');
+
+        const metaData = result.recordset[0] || null;
+        const ingredients = result.recordsets[1] || [];
+        const steps = result.recordsets[2] || [];
+
+        if (!metaData) {
+            return res.status(404).json({ success: false, message: 'Receta no encontrada' });
+        }
+        res.json({ success: true, data: { ...metaData, ingredients, steps } });
+    } catch (error) {
+        console.error('Error al obtener detalles de la receta:', error);
+        return res.status(500).json({ success: false, message: 'Error al obtener detalles de la receta', error: error.message });
+    }
+};
+
 

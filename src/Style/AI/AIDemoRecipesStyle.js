@@ -38,11 +38,10 @@ export const styles = StyleSheet.create({
 
     // --- Títulos de la Receta ---
     linkText: {
-        fontSize: 16,
+        fontSize: 26,
         color: '#1a4785', // Azul de enlace
         textAlign: 'center',
         marginTop: 10,
-        textDecorationLine: 'underline',
     },
     mainTitle: {
         fontSize: 28,

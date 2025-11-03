@@ -1,92 +1,216 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
     View,
     Text,
     TouchableOpacity,
     ScrollView,
-    // No necesitamos TextInput, KeyboardAvoidingView, o SafeAreaView aquí
+    Alert, 
+    ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
+import * as Speech from 'expo-speech'; 
 import { styles } from '../../Style/AI/AIDemoRecipesStyle.js';
 import { a11yEs } from '../../Services/a11y';
-// --- Datos de la Receta ---
-const RECIPE_STEPS = [
-    {
-        number: 1,
-        title: 'Preparar los ingredientes',
-        description: 'Lava y pica la albahaca fresca. Corta los tomates en cubos pequeños. Pela y pica finamente 2 dientes de ajo.',
-        time: '5 min',
-    },
-    {
-        number: 2,
-        title: 'Hervir el agua',
-        description: 'Pon una olla grande de agua a hervir con una cucharada de sal. El agua debe estar a borbotones antes de seguir.',
-        time: '10 min',
-    },
-    {
-        number: 3,
-        title: 'Cocinar la pasta',
-        description: 'Agrega la pasta al agua hirviendo. Cocina por el tiempo indicado en el paquete, o hasta que esté al dente.',
-        time: '12 min',
-    },
-    {
-        number: 4,
-        title: 'Preparar la salsa',
-        description: 'Mientras la pasta se cocina, en un sartén grande con aceite, sofríe el ajo picado. Agrega los tomates picados y cocina a fuego lento por 10 minutos. Sazona con sal y pimienta.',
-        time: '15 min',
-    },
-    {
-        number: 5,
-        title: 'Combinar y servir',
-        description: 'Escurre la pasta y añádela al sartén con la salsa de tomate. Mezcla bien y añade la albahaca fresca. Sirve inmediatamente.',
-        time: '3 min',
-    },
-];
+import URL from '../../Services/url.js'; 
 
-const AIDemoRecipesScreen = ({ navigation }) => {
-    // Estado para el paso actual (basado en índice, de 0 a 4)
+const API_URL = `${URL}:3000/home/recipeDetails`; 
+
+const initialRecipeData = {
+    name: 'Cargando Receta...',
+    time: 0,
+    difficulty: 'Cargando...',
+    servings: 0,
+    diet: 'Cargando...',
+    ingredients: [],
+    steps: [],
+};
+
+
+const AIDemoRecipesScreen = ({ navigation, route }) => {
+    
+    const { receta_id } = route.params || {}; 
+    const [recipeData, setRecipeData] = useState(initialRecipeData);
+    const [loading, setLoading] = useState(true);
     const [currentStepIndex, setCurrentStepIndex] = useState(0); 
+    
+    const [timeRemaining, setTimeRemaining] = useState(0); 
+    const [timerRunning, setTimerRunning] = useState(false);
 
-    const currentStep = RECIPE_STEPS[currentStepIndex];
-    const totalSteps = RECIPE_STEPS.length;
+    const fetchRecipeDetails = useCallback(async () => {
+        if (!receta_id) {
+            setLoading(false);
+            Alert.alert('Error', 'No se recibió el ID de la receta.');
+            navigation.goBack();
+            return;
+        }
+
+        setLoading(true);
+        const endpoint = `${API_URL}?receta_id=${receta_id}`;
+
+        try {
+            const response = await fetch(endpoint);
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Error del servidor: ${response.status} - ${errorText}`);
+            }
+
+            const data = await response.json();
+
+            if (data.success && data.data) {
+                setRecipeData(data.data);
+                setTimeRemaining(data.data.time * 60); 
+                setCurrentStepIndex(0); 
+            } else {
+                Alert.alert('Error', data.message || 'No se pudieron obtener los detalles de la receta.');
+                navigation.goBack();
+            }
+        } catch (error) {
+            Alert.alert('Error', 'No se pudo conectar con el servidor para obtener la receta.');
+            navigation.goBack();
+        } finally {
+            setLoading(false);
+        }
+    }, [receta_id, navigation]);
+
+    useEffect(() => {
+        fetchRecipeDetails();
+    }, [fetchRecipeDetails]);
+
+    useEffect(() => {
+        let interval = null;
+
+        if (timerRunning && timeRemaining > 0) {
+            interval = setInterval(() => {
+                setTimeRemaining(prevTime => prevTime - 1);
+            }, 1000); 
+        } 
+        else if (!timerRunning || timeRemaining === 0) {
+            clearInterval(interval);
+            
+            if (timeRemaining === 0 && timerRunning) {
+                Alert.alert('¡Tiempo!', 'El temporizador de la receta ha finalizado.');
+                setTimerRunning(false);
+            }
+        }
+
+        return () => clearInterval(interval);
+    }, [timerRunning, timeRemaining]); 
+
+    useEffect(() => {
+        return () => {
+            Speech.stop();
+        };
+    }, []);
+
+
+    if (loading) {
+        return (
+            <SafeAreaView style={styles.safeArea}>
+                <View style={styles.container}>
+                    <ActivityIndicator size="large" color="#FF8C00" style={{ marginTop: 50 }} />
+                    <Text style={{ textAlign: 'center', marginTop: 10 }}>Cargando detalles de la receta...</Text>
+                </View>
+            </SafeAreaView>
+        );
+    }
+
+    const currentStep = recipeData.steps[currentStepIndex];
+    const totalSteps = recipeData.steps.length;
     
-    // --- Lógica de Navegación de Pasos ---
-    
+
+
     const handleNext = () => {
-        if (currentStepIndex < totalSteps - 1) {
-            setCurrentStepIndex(currentStepIndex + 1);
+        Speech.stop(); // Detener audio al cambiar de paso
+        const newIndex = currentStepIndex + 1;
+        if (newIndex < totalSteps) {
+            setCurrentStepIndex(newIndex);
         }
     };
 
     const handlePrevious = () => {
-        if (currentStepIndex > 0) {
-            setCurrentStepIndex(currentStepIndex - 1);
+        Speech.stop(); // Detener audio al cambiar de paso
+        const newIndex = currentStepIndex - 1;
+        if (newIndex >= 0) {
+            setCurrentStepIndex(newIndex);
         }
     };
-    
-    // Función genérica para ir a un paso específico (usado en el Resumen)
+
     const goToStep = (index) => {
+        Speech.stop(); // Detener audio al saltar a un paso
         if (index >= 0 && index < totalSteps) {
             setCurrentStepIndex(index);
         }
     };
-
     const handleReproduce = () => {
-        console.log(`Reproduciendo texto del paso ${currentStep.number}: ${currentStep.description}`);
-        // Aquí se integraría una librería de Texto-a-Voz (TTS)
-    };
+        const textToSpeak = currentStep.description;
+        
+        if (!textToSpeak) {
+            Alert.alert('Error', 'No hay descripción para reproducir.');
+            return;
+        }
 
+        // Detener cualquier reproducción anterior
+        Speech.stop(); 
+        // Reproducir la descripción actual en español
+        Speech.speak(textToSpeak, {
+            language: 'es-ES', // Puedes usar 'es' o 'es-ES'
+            onDone: () => console.log('[DEBUG] Reproducción finalizada.'),
+            onError: (err) => console.log('[DEBUG] Error al reproducir audio.', err)
+        });
+    };
+    
     const handleStartTimer = () => {
-        console.log(`Iniciando temporizador de ${currentStep.time} para el paso ${currentStep.number}`);
-        // Aquí se integraría la lógica del temporizador
+        if (timeRemaining === 0 && !timerRunning) {
+            setTimeRemaining(recipeData.time * 60); 
+            setTimerRunning(true); 
+        } else {
+            setTimerRunning(!timerRunning); 
+        }
     };
-
+    
     const handleGoBack = () => {
-        navigation.goBack();
+        Speech.stop(); // Detener audio al regresar
+        navigation.goBack(); 
     };
 
-    // Usamos ScrollView para permitir el desplazamiento del contenido
+
+    const formatTime = (totalSeconds) => {
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    };
+
+    const getTimerButtonText = () => {
+        if (timerRunning) {
+            return 'Pausar Temporizador';
+        }
+        if (timeRemaining > 0 && timeRemaining < (recipeData.time * 60)) {
+            return 'Continuar Temporizador';
+        }
+        if (timeRemaining === 0 && recipeData.time > 0) {
+            return 'Reiniciar Temporizador';
+        }
+        return 'Iniciar Temporizador'; 
+    };
+
+    if (!currentStep) {
+        return (
+            <SafeAreaView style={styles.safeArea}>
+                <View style={styles.container}>
+                    <Text style={styles.mainTitle}>Error</Text>
+                    <Text style={styles.stepDescription}>
+                        La receta cargada no tiene pasos de preparación definidos.
+                    </Text>
+                    <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
+                        <Text style={styles.backButtonText}>Regresar</Text>
+                    </TouchableOpacity>
+                </View>
+            </SafeAreaView>
+        );
+    }
+    
+    
     return (
         <>
         <SafeAreaView edges={['top']} style={styles.safeTop} />
@@ -99,47 +223,41 @@ const AIDemoRecipesScreen = ({ navigation }) => {
             <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                 <View style={styles.container}>
                     
-                    {/* Título de Receta y Enlace */}
-                    <TouchableOpacity onPress={() => console.log('Ir a Demo de Receta')} accessibilityRole="link" accessibilityLabel="Ir a la demo de receta" {...a11yEs}>
+                    <View>
                         <Text style={styles.linkText}>Demo de Receta</Text>
-                    </TouchableOpacity>
-                    <Text {...a11yEs} style={styles.mainTitle}>Pasta con Tomate y Albahaca</Text>
+                    </View>
+                    <Text {...a11yEs} style={styles.mainTitle}>{recipeData.name}</Text>
                     
-                    {/* Tags de Información */}
                     <View style={styles.tagsContainer}>
                         <View style={styles.tag}>
-                            <Text {...a11yEs} style={styles.tagText}>30 minutos</Text>
+                            <Text {...a11yEs} style={styles.tagText}>{`${recipeData.time} minutos`}</Text>
                         </View>
                         <View style={styles.tag}>
-                            <Text {...a11yEs} style={styles.tagText}>Dificultad: Fácil</Text>
+                            <Text {...a11yEs} style={styles.tagText}>{`Dificultad: ${recipeData.difficulty}`}</Text>
                         </View>
                         <View style={styles.tag}>
                             <Text {...a11yEs} style={styles.tagText}>{`Paso ${currentStep.number} de ${totalSteps}`}</Text>
                         </View>
                     </View>
 
-                    {/* Área del Paso Actual */}
                     <View style={styles.stepContainer}>
                         <View style={styles.stepHeader}>
                             <View style={styles.stepNumberBubble}>
                                 <Text {...a11yEs} style={styles.stepNumber}>{currentStep.number}</Text>
                             </View>
-                            <Text {...a11yEs} style={styles.stepTitle}>{currentStep.title}</Text>
+                            <Text {...a11yEs} style={styles.stepTitle}>{`Paso ${currentStep.number}`}</Text>
                         </View>
 
                         <Text {...a11yEs} style={styles.stepDescription}>
                             {currentStep.description}
                         </Text>
                         
-                        {/* Controles de Navegación */}
                         <View style={styles.navigationButtons}>
                             <TouchableOpacity 
                                 {...a11yEs}
                                 style={[styles.navButton, currentStepIndex === 0 && { opacity: 0.5 }]}
                                 onPress={handlePrevious} 
                                 disabled={currentStepIndex === 0}
-                                accessibilityRole="button"
-                                accessibilityLabel="Paso anterior"
                             >
                                 <Text style={styles.navButtonText}>Anterior</Text>
                             </TouchableOpacity>
@@ -148,8 +266,6 @@ const AIDemoRecipesScreen = ({ navigation }) => {
                                 {...a11yEs}
                                 style={[styles.navButton, styles.reproduceButton]}
                                 onPress={handleReproduce}
-                                accessibilityRole="button"
-                                accessibilityLabel="Reproducir el paso actual"
                             >
                                 <Text style={styles.navButtonText}>Reproducir</Text>
                             </TouchableOpacity>
@@ -159,53 +275,54 @@ const AIDemoRecipesScreen = ({ navigation }) => {
                                 style={[styles.navButton, currentStepIndex === totalSteps - 1 && { opacity: 0.5 }]}
                                 onPress={handleNext}
                                 disabled={currentStepIndex === totalSteps - 1}
-                                accessibilityRole="button"
-                                accessibilityLabel="Siguiente paso"
                             >
                                 <Text style={styles.navButtonText}>Siguiente</Text>
                             </TouchableOpacity>
                         </View>
 
-                        {/* Temporizador */}
                         <Text {...a11yEs} style={styles.timerText}>
-                            {currentStep.time}
+                           Tiempo Total Restante: {formatTime(timeRemaining)}
                         </Text>
                         <TouchableOpacity 
                             {...a11yEs}
                             style={styles.timerButton}
                             onPress={handleStartTimer}
-                            accessibilityRole="button"
-                            accessibilityLabel={`Iniciar temporizador de ${currentStep.time}`}
+                            disabled={recipeData.time === 0} 
                         >
-                            <Text style={styles.timerButtonText}>Iniciar Temporizador</Text>
+                            <Text style={styles.timerButtonText}>
+                                {getTimerButtonText()}
+                            </Text>
                         </TouchableOpacity>
+
+                        <Text {...a11yEs} style={styles.summaryTitle}>Ingredientes</Text>
+                        {recipeData.ingredients.map((ing, index) => (
+                             <Text key={index} style={styles.ingredientText}>
+                                 {`${ing.cantidad} ${ing.unidad} de ${ing.name}`}
+                            </Text>
+                        ))}
                     </View>
 
-                    {/* Resumen de Pasos */}
                     <Text {...a11yEs} style={styles.summaryTitle}>Resumen de pasos</Text>
-                    {RECIPE_STEPS.map((step, index) => (
+                    {recipeData.steps.map((step, index) => (
                         <TouchableOpacity
                             key={step.number}
                             style={[
                                 styles.summaryButton,
-                                index === currentStepIndex && { borderColor: '#FF8C00', borderWidth: 2 } // Destacar paso actual
+                                index === currentStepIndex && { borderColor: '#FF8C00', borderWidth: 2 } 
                             ]}
-                            onPress={() => goToStep(index)}
+                            onPress={() => goToStep(index)} 
                             {...a11yEs}
-                            accessibilityRole="button"
-                            accessibilityLabel={`Ir al paso ${step.number}: ${step.title}`}
+                            accessibilityLabel={`Ir al paso ${step.number}: ${step.description.substring(0, 30)}...`}
                         >
                             <Text {...a11yEs} style={styles.summaryButtonText}>
-                                {`${step.number}. ${step.title}`}
+                                {`${step.number}. ${step.description.substring(0, 40)}...`}
                             </Text>
                         </TouchableOpacity>
                     ))}
                     
-                    {/* El botón 'Regresar' fijo se manejará fuera del ScrollView, por eso agregamos paddingBottom al container */}
                 </View>
             </ScrollView>
 
-            {/* Botón Regresar (Fijo, fuera del ScrollView) */}
             <TouchableOpacity
                 {...a11yEs}
                 style={styles.backButton}
