@@ -62,7 +62,7 @@ const DashboardScreen = ({ navigation }) => {
           time: item.time,
           diet: item.diet,
           difficulty: item.difficulty,
-          image: item.image ? { uri: item.image } : null,
+          image: item.image ? { uri: `${URL}:3000/images/${item.image}` } : null,
           isFavorite: item.isFavorite === true || item.isFavorite === 'true',
         }));
         setRecommendations(formatted);

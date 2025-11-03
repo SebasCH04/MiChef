@@ -57,15 +57,17 @@ const RecipeManagerScreen = ({ navigation }) => {
       const data = await response.json();
 
       if (data.success && Array.isArray(data.data)) {
+        let sourceImage = null;
         let formatted = data.data.map(item => ({
           id: item.id,
           name: item.name,
           time: item.time,
           diet: item.diet,
           difficulty: item.difficulty,
-          image: item.image ? { uri: item.image } : null,
+          image: item.image ? { uri: `${URL}:3000/images/${item.image}` } : null,
           isFavorite: item.isFavorite === true || item.isFavorite === 'true',
         }));
+        
         // Intento de orden más nuevo a más viejo por id si aplica
         formatted.sort((a, b) => (b.id ?? 0) - (a.id ?? 0));
         setFilteredRecipes(formatted);
@@ -92,6 +94,7 @@ const RecipeManagerScreen = ({ navigation }) => {
       return;
     }
     await fetchRecipes(term);
+    //console.log('Búsqueda realizada para:', filteredRecipes);
   };
 
   // Cargar todas las recetas al iniciar (cuando tenemos usuario)
